@@ -29,6 +29,12 @@ export default function RootLayout() {
           headerShown: false,
         }}
       >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="welcome" />
+        <Stack.Screen name="auth/customer-auth" />
+        <Stack.Screen name="auth/location-setup" />
+        <Stack.Screen name="auth/vendor-auth" />
+        <Stack.Screen name="vendor-dashboard" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         <Stack.Screen name="formsheet" options={{ presentation: 'formSheet' }} />
