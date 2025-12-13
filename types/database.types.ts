@@ -31,6 +31,17 @@ export type PaymentStatus = "unpaid" | "paid" | "refunded";
 
 export type SpicyLevel = "None" | "Mild" | "Medium" | "Hot" | "Extra Hot";
 
+export type EventType = 
+  | "Brunch" 
+  | "Festival" 
+  | "Pop-up" 
+  | "Market" 
+  | "Tasting" 
+  | "Party" 
+  | "Meetup";
+
+export type EventAttendeeStatus = "interested" | "going";
+
 // ========================================
 // USER
 // ========================================
@@ -207,6 +218,52 @@ export interface StateAndCity {
 }
 
 // ========================================
+// EVENTS
+// ========================================
+export interface Event {
+  id: string;
+  title: string;
+  subtitle?: string;
+  description: string;
+  event_type: EventType;
+  diaspora_focus: DiasporaSegment[];
+  cuisines_highlighted: string[];
+  city: string;
+  state: string;
+  venue_name?: string;
+  venue_address_line1?: string;
+  venue_address_line2?: string;
+  venue_zip?: string;
+  latitude?: number;
+  longitude?: number;
+  start_datetime: string;
+  end_datetime: string;
+  is_all_day: boolean;
+  is_online: boolean;
+  linked_vendor_id?: string;
+  hero_image: string;
+  capacity?: number;
+  ticket_required: boolean;
+  ticket_url?: string;
+  is_featured: boolean;
+  is_published: boolean;
+  created_by_admin_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// ========================================
+// EVENT ATTENDEES
+// ========================================
+export interface EventAttendee {
+  id: string;
+  event_id: string;
+  user_id: string;
+  status: EventAttendeeStatus;
+  created_at: string;
+}
+
+// ========================================
 // HELPER TYPES
 // ========================================
 export interface VendorWithDetails extends Vendor {
@@ -219,4 +276,10 @@ export interface OrderWithDetails extends Order {
   order_items?: OrderItem[];
   vendor?: Vendor;
   customer?: User;
+}
+
+export interface EventWithDetails extends Event {
+  linked_vendor?: Vendor;
+  attendees?: EventAttendee[];
+  attendee_count?: number;
 }

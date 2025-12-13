@@ -35,6 +35,7 @@ export default function FloatingTabBar({ tabs }: FloatingTabBarProps) {
     const iconMap: { [key: string]: { ios: string; android: string } } = {
       home: { ios: isActive ? 'house.fill' : 'house', android: 'home' },
       search: { ios: isActive ? 'magnifyingglass' : 'magnifyingglass', android: 'search' },
+      calendar: { ios: isActive ? 'calendar' : 'calendar', android: 'event' },
       map: { ios: isActive ? 'map.fill' : 'map', android: 'map' },
       receipt: { ios: isActive ? 'bag.fill' : 'bag', android: 'shopping_bag' },
       person: { ios: isActive ? 'person.fill' : 'person', android: 'person' },

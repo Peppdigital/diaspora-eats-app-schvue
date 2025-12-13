@@ -15,6 +15,7 @@ import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
 import { DiasporaSegment } from '@/types/database.types';
 import { MOCK_VENDORS } from '@/constants/MockVendorData';
+import { MOCK_EVENTS } from '@/constants/MockEventData';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -50,6 +51,33 @@ export default function HomeScreen() {
   const nearbyVendors = user?.default_location_city
     ? MOCK_VENDORS.filter((v) => v.city === user.default_location_city)
     : [];
+
+  // Upcoming events in user's location
+  const now = new Date();
+  const upcomingEvents = MOCK_EVENTS.filter((event) => {
+    const eventDate = new Date(event.start_datetime);
+    const isUpcoming = eventDate >= now;
+    const isPublished = event.is_published;
+    const matchesLocation = user?.default_location_state 
+      ? event.state === user.default_location_state
+      : true;
+    
+    return isUpcoming && isPublished && matchesLocation;
+  })
+  .sort((a, b) => new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime())
+  .slice(0, 5);
+
+  const formatEventDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    };
+    return date.toLocaleDateString('en-US', options);
+  };
 
   const VendorCard = ({ vendor, horizontal = false }: any) => (
     <TouchableOpacity
@@ -92,6 +120,62 @@ export default function HomeScreen() {
         </View>
         <View style={styles.badges}>
           {vendor.diaspora_focus.slice(0, 2).map((focus, index) => (
+            <React.Fragment key={index}>
+              <View style={[styles.badge, { backgroundColor: colors.highlight }]}>
+                <Text style={[styles.badgeText, { color: colors.text }]}>
+                  {focus}
+                </Text>
+              </View>
+            </React.Fragment>
+          ))}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const EventCard = ({ event }: any) => (
+    <TouchableOpacity
+      style={[styles.eventCardHorizontal, { backgroundColor: cardColor }]}
+      onPress={() => router.push(`/event-detail?id=${event.id}`)}
+      activeOpacity={0.8}
+    >
+      <Image
+        source={{ uri: event.hero_image }}
+        style={styles.eventImageHorizontal}
+      />
+      <View style={styles.eventInfo}>
+        <Text style={[styles.eventTitle, { color: textColor }]} numberOfLines={2}>
+          {event.title}
+        </Text>
+        <View style={styles.eventMeta}>
+          <View style={styles.metaRow}>
+            <IconSymbol
+              ios_icon_name="calendar"
+              android_material_icon_name="event"
+              size={12}
+              color={colors.primary}
+            />
+            <Text style={[styles.eventMetaText, { color: textSecondaryColor }]} numberOfLines={1}>
+              {formatEventDate(event.start_datetime)}
+            </Text>
+          </View>
+          <View style={styles.metaRow}>
+            <IconSymbol
+              ios_icon_name="location.fill"
+              android_material_icon_name="location_on"
+              size={12}
+              color={colors.primary}
+            />
+            <Text style={[styles.eventMetaText, { color: textSecondaryColor }]}>
+              {event.city}, {event.state}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.eventBadges}>
+          <View style={[styles.eventTypeBadge, { backgroundColor: colors.primary }]}>
+            <Text style={styles.eventTypeBadgeText}>{event.event_type}</Text>
+          </View>
+          {event.diaspora_focus.slice(0, 1).map((focus, index) => (
             <React.Fragment key={index}>
               <View style={[styles.badge, { backgroundColor: colors.highlight }]}>
                 <Text style={[styles.badgeText, { color: colors.text }]}>
@@ -173,6 +257,31 @@ export default function HomeScreen() {
           ))}
         </ScrollView>
 
+        {/* Upcoming Events Section */}
+        {upcomingEvents.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: textColor }]}>
+                Upcoming Events & Socials
+              </Text>
+              <TouchableOpacity onPress={() => router.push('/(tabs)/events')}>
+                <Text style={[styles.seeAll, { color: colors.primary }]}>View All</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalList}
+            >
+              {upcomingEvents.map((event, index) => (
+                <React.Fragment key={index}>
+                  <EventCard event={event} />
+                </React.Fragment>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
         {/* Featured This Week */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -234,7 +343,7 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Bottom Padding for Tab Bar */}
+        {/* Bottom Padding */}
         <View style={styles.bottomPadding} />
       </ScrollView>
     </View>
@@ -246,7 +355,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: 60,
+    paddingTop: 48,
   },
   header: {
     paddingHorizontal: 20,
@@ -264,10 +373,8 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 12,
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+    elevation: 2,
   },
   locationText: {
     flex: 1,
@@ -323,20 +430,16 @@ const styles = StyleSheet.create({
     width: 280,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.08)',
+    elevation: 4,
   },
   vendorCard: {
     marginHorizontal: 20,
     marginBottom: 16,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.08)',
+    elevation: 4,
   },
   vendorImageHorizontal: {
     width: '100%',
@@ -393,6 +496,54 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 11,
     fontWeight: '600',
+  },
+  eventCardHorizontal: {
+    width: 280,
+    borderRadius: 16,
+    overflow: 'hidden',
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.08)',
+    elevation: 4,
+  },
+  eventImageHorizontal: {
+    width: '100%',
+    height: 140,
+  },
+  eventInfo: {
+    padding: 14,
+  },
+  eventTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  eventMeta: {
+    gap: 6,
+    marginBottom: 8,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  eventMetaText: {
+    fontSize: 12,
+    fontWeight: '500',
+    flex: 1,
+  },
+  eventBadges: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  eventTypeBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  eventTypeBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
   },
   bottomPadding: {
     height: 40,

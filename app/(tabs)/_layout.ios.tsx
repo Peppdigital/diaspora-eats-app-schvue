@@ -13,9 +13,9 @@ export default function TabLayout() {
         <Icon sf="magnifyingglass" />
         <Label>Explore</Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger key="cart" name="cart">
-        <Icon sf="cart.fill" />
-        <Label>Cart</Label>
+      <NativeTabs.Trigger key="events" name="events">
+        <Icon sf="calendar" />
+        <Label>Events</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger key="orders" name="orders">
         <Icon sf="bag.fill" />
