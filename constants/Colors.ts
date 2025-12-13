@@ -1,5 +1,8 @@
-const tintColorLight = "#0a7ea4";
-const tintColorDark = "#fff";
+
+import * as AppColors from '@/components/colors';
+
+const tintColorLight = AppColors.primary;
+const tintColorDark = AppColors.primary;
 
 export const zincColors = {
   50: "#fafafa",
@@ -20,22 +23,33 @@ export const appleRed = "#FF3B30";
 
 export const borderColor = "#A1A1AA80";
 export const appleGreen = "#34C759";
+
 export const Colors = {
   light: {
-    text: "#11181C",
-    background: "#fff",
+    text: AppColors.text,
+    background: AppColors.background,
     tint: tintColorLight,
-    icon: "#687076",
-    tabIconDefault: "#687076",
+    icon: AppColors.textSecondary,
+    tabIconDefault: AppColors.textSecondary,
     tabIconSelected: tintColorLight,
+    primary: AppColors.primary,
+    secondary: AppColors.secondary,
+    accent: AppColors.accent,
+    card: AppColors.card,
+    highlight: AppColors.highlight,
   },
   dark: {
-    text: "#ECEDEE",
-    background: "#151718",
+    text: AppColors.textDark,
+    background: AppColors.backgroundDark,
     tint: tintColorDark,
-    icon: "#9BA1A6",
-    tabIconDefault: "#9BA1A6",
+    icon: AppColors.textSecondaryDark,
+    tabIconDefault: AppColors.textSecondaryDark,
     tabIconSelected: tintColorDark,
+    primary: AppColors.primary,
+    secondary: AppColors.secondary,
+    accent: AppColors.accent,
+    card: AppColors.cardDark,
+    highlight: AppColors.highlightDark,
   },
 };
 
