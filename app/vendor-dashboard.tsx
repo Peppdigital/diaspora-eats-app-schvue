@@ -122,7 +122,7 @@ export default function VendorDashboardScreen() {
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.actionButton}
-              onPress={() => console.log('Manage Menu')}
+              onPress={() => router.push('/vendor-menu')}
             >
               <View style={styles.actionButtonLeft}>
                 <IconSymbol 
@@ -142,7 +142,7 @@ export default function VendorDashboardScreen() {
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.actionButton}
-              onPress={() => console.log('View Profile')}
+              onPress={() => router.push('/vendor-profile')}
             >
               <View style={styles.actionButtonLeft}>
                 <IconSymbol 

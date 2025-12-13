@@ -156,6 +156,32 @@ export default function ProfileScreen() {
 
         {/* Menu Items */}
         <View style={styles.menuSection}>
+          {user.role === 'admin' && (
+            <TouchableOpacity
+              style={[styles.menuItem, { backgroundColor: cardColor, borderWidth: 2, borderColor: colors.primary }]}
+              onPress={() => router.push('/admin-vendors')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.menuItemLeft}>
+                <IconSymbol
+                  ios_icon_name="shield.fill"
+                  android_material_icon_name="admin_panel_settings"
+                  size={22}
+                  color={colors.primary}
+                />
+                <Text style={[styles.menuItemText, { color: colors.primary }]}>
+                  Admin Panel
+                </Text>
+              </View>
+              <IconSymbol
+                ios_icon_name="chevron.right"
+                android_material_icon_name="chevron_right"
+                size={18}
+                color={colors.primary}
+              />
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity
             style={[styles.menuItem, { backgroundColor: cardColor }]}
             onPress={() => router.push('/favorites')}
