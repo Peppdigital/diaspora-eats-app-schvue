@@ -19,10 +19,10 @@ export default function TabLayout() {
       label: 'Explore',
     },
     {
-      name: 'map',
-      route: '/(tabs)/map',
-      icon: 'map',
-      label: 'Map',
+      name: 'cart',
+      route: '/(tabs)/cart',
+      icon: 'cart',
+      label: 'Cart',
     },
     {
       name: 'orders',
@@ -50,6 +50,7 @@ export default function TabLayout() {
         <Stack.Screen key="home" name="(home)" />
         <Stack.Screen key="explore" name="explore" />
         <Stack.Screen key="map" name="map" />
+        <Stack.Screen key="cart" name="cart" />
         <Stack.Screen key="orders" name="orders" />
         <Stack.Screen key="profile" name="profile" />
       </Stack>

@@ -1,12 +1,14 @@
 
 import React from "react";
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Platform } from "react-native";
+import { useRouter } from "expo-router";
 import { useTheme } from "@react-navigation/native";
 import { colors } from "@/styles/commonStyles";
 import { IconSymbol } from "@/components/IconSymbol";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const theme = useTheme();
   const isDark = theme.dark;
   const { user, isAuthenticated, signOut } = useAuth();
@@ -16,14 +18,49 @@ export default function ProfileScreen() {
   const textSecondaryColor = isDark ? colors.textSecondaryDark : colors.textSecondary;
   const cardColor = isDark ? colors.cardDark : colors.card;
 
-  const menuItems = [
-    { icon: 'heart', label: 'Favorites', route: '/favorites' },
-    { icon: 'location', label: 'Addresses', route: '/addresses' },
-    { icon: 'creditcard', label: 'Payment Methods', route: '/payment' },
-    { icon: 'bell', label: 'Notifications', route: '/notifications' },
-    { icon: 'gear', label: 'Settings', route: '/settings' },
-    { icon: 'questionmark.circle', label: 'Help & Support', route: '/support' },
-  ];
+  const handleSignOut = async () => {
+    await signOut();
+    router.replace('/welcome');
+  };
+
+  if (!isAuthenticated || !user) {
+    return (
+      <View style={[styles.container, { backgroundColor: bgColor }]}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <Text style={[styles.title, { color: textColor }]}>
+              Profile
+            </Text>
+          </View>
+
+          <View style={[styles.authPrompt, { backgroundColor: cardColor }]}>
+            <IconSymbol
+              ios_icon_name="person.circle"
+              android_material_icon_name="account_circle"
+              size={64}
+              color={textSecondaryColor}
+            />
+            <Text style={[styles.authTitle, { color: textColor }]}>
+              Sign in to continue
+            </Text>
+            <Text style={[styles.authText, { color: textSecondaryColor }]}>
+              Create an account or sign in to access your profile and orders
+            </Text>
+            <TouchableOpacity
+              style={[styles.authButton, { backgroundColor: colors.primary }]}
+              onPress={() => router.push('/auth/customer-auth')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.authButtonText}>Sign In / Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: bgColor }]}>
@@ -39,100 +76,175 @@ export default function ProfileScreen() {
         </View>
 
         {/* User Info Card */}
-        {isAuthenticated && user ? (
-          <View style={[styles.userCard, { backgroundColor: cardColor }]}>
-            <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
-              <Text style={styles.avatarText}>
-                {user.full_name.charAt(0).toUpperCase()}
-              </Text>
-            </View>
-            <View style={styles.userInfo}>
-              <Text style={[styles.userName, { color: textColor }]}>
-                {user.full_name}
-              </Text>
-              <Text style={[styles.userEmail, { color: textSecondaryColor }]}>
-                {user.email}
-              </Text>
-              {user.default_location_city && user.default_location_state && (
-                <View style={styles.locationRow}>
-                  <IconSymbol
-                    ios_icon_name="location.fill"
-                    android_material_icon_name="location_on"
-                    size={14}
-                    color={textSecondaryColor}
-                  />
-                  <Text style={[styles.locationText, { color: textSecondaryColor }]}>
-                    {user.default_location_city}, {user.default_location_state}
-                  </Text>
-                </View>
-              )}
-            </View>
+        <View style={[styles.userCard, { backgroundColor: cardColor }]}>
+          <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
+            <Text style={styles.avatarText}>
+              {user.full_name.charAt(0).toUpperCase()}
+            </Text>
           </View>
-        ) : (
-          <View style={[styles.authPrompt, { backgroundColor: cardColor }]}>
-            <Text style={[styles.authTitle, { color: textColor }]}>
-              Sign in to continue
+          <View style={styles.userInfo}>
+            <Text style={[styles.userName, { color: textColor }]}>
+              {user.full_name}
             </Text>
-            <Text style={[styles.authText, { color: textSecondaryColor }]}>
-              Create an account or sign in to access your profile and orders
+            <Text style={[styles.userEmail, { color: textSecondaryColor }]}>
+              {user.email}
             </Text>
-            <TouchableOpacity
-              style={[styles.authButton, { backgroundColor: colors.primary }]}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.authButtonText}>Sign In / Sign Up</Text>
-            </TouchableOpacity>
+            {user.default_location_city && user.default_location_state && (
+              <View style={styles.locationRow}>
+                <IconSymbol
+                  ios_icon_name="location.fill"
+                  android_material_icon_name="location_on"
+                  size={14}
+                  color={textSecondaryColor}
+                />
+                <Text style={[styles.locationText, { color: textSecondaryColor }]}>
+                  {user.default_location_city}, {user.default_location_state}
+                </Text>
+              </View>
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => router.push('/edit-profile')}
+          >
+            <IconSymbol
+              ios_icon_name="pencil"
+              android_material_icon_name="edit"
+              size={20}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Diaspora & Cuisines */}
+        {(user.diaspora_segment.length > 0 || user.favorite_cuisines.length > 0) && (
+          <View style={[styles.preferencesCard, { backgroundColor: cardColor }]}>
+            {user.diaspora_segment.length > 0 && (
+              <View style={styles.preferenceSection}>
+                <Text style={[styles.preferenceLabel, { color: textSecondaryColor }]}>
+                  Diaspora Segment
+                </Text>
+                <View style={styles.tagsRow}>
+                  {user.diaspora_segment.map((segment, index) => (
+                    <View key={index} style={[styles.tag, { backgroundColor: colors.highlight }]}>
+                      <Text style={[styles.tagText, { color: colors.secondary }]}>
+                        {segment}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+            {user.favorite_cuisines.length > 0 && (
+              <View style={styles.preferenceSection}>
+                <Text style={[styles.preferenceLabel, { color: textSecondaryColor }]}>
+                  Favorite Cuisines
+                </Text>
+                <View style={styles.tagsRow}>
+                  {user.favorite_cuisines.map((cuisine, index) => (
+                    <View key={index} style={[styles.tag, { backgroundColor: colors.highlight }]}>
+                      <Text style={[styles.tagText, { color: colors.secondary }]}>
+                        {cuisine}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
           </View>
         )}
 
         {/* Menu Items */}
         <View style={styles.menuSection}>
-          {menuItems.map((item, index) => (
-            <React.Fragment key={index}>
-              <TouchableOpacity
-                style={[styles.menuItem, { backgroundColor: cardColor }]}
-                activeOpacity={0.7}
-              >
-                <View style={styles.menuItemLeft}>
-                  <IconSymbol
-                    ios_icon_name={item.icon}
-                    android_material_icon_name={item.icon.replace('.', '_')}
-                    size={22}
-                    color={colors.primary}
-                  />
-                  <Text style={[styles.menuItemText, { color: textColor }]}>
-                    {item.label}
-                  </Text>
-                </View>
-                <IconSymbol
-                  ios_icon_name="chevron.right"
-                  android_material_icon_name="chevron_right"
-                  size={18}
-                  color={textSecondaryColor}
-                />
-              </TouchableOpacity>
-            </React.Fragment>
-          ))}
+          <TouchableOpacity
+            style={[styles.menuItem, { backgroundColor: cardColor }]}
+            onPress={() => router.push('/favorites')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.menuItemLeft}>
+              <IconSymbol
+                ios_icon_name="heart.fill"
+                android_material_icon_name="favorite"
+                size={22}
+                color={colors.primary}
+              />
+              <Text style={[styles.menuItemText, { color: textColor }]}>
+                Saved/Favorite Spots
+              </Text>
+            </View>
+            <IconSymbol
+              ios_icon_name="chevron.right"
+              android_material_icon_name="chevron_right"
+              size={18}
+              color={textSecondaryColor}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.menuItem, { backgroundColor: cardColor }]}
+            onPress={() => router.push('/manage-addresses')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.menuItemLeft}>
+              <IconSymbol
+                ios_icon_name="location.fill"
+                android_material_icon_name="location_on"
+                size={22}
+                color={colors.primary}
+              />
+              <Text style={[styles.menuItemText, { color: textColor }]}>
+                Manage Addresses
+              </Text>
+            </View>
+            <IconSymbol
+              ios_icon_name="chevron.right"
+              android_material_icon_name="chevron_right"
+              size={18}
+              color={textSecondaryColor}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.menuItem, { backgroundColor: cardColor }]}
+            onPress={() => router.push('/edit-profile')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.menuItemLeft}>
+              <IconSymbol
+                ios_icon_name="person.fill"
+                android_material_icon_name="person"
+                size={22}
+                color={colors.primary}
+              />
+              <Text style={[styles.menuItemText, { color: textColor }]}>
+                Edit Profile
+              </Text>
+            </View>
+            <IconSymbol
+              ios_icon_name="chevron.right"
+              android_material_icon_name="chevron_right"
+              size={18}
+              color={textSecondaryColor}
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Sign Out Button */}
-        {isAuthenticated && (
-          <TouchableOpacity
-            style={[styles.signOutButton, { backgroundColor: cardColor }]}
-            onPress={signOut}
-            activeOpacity={0.7}
-          >
-            <IconSymbol
-              ios_icon_name="arrow.right.square"
-              android_material_icon_name="logout"
-              size={22}
-              color="#FF3B30"
-            />
-            <Text style={[styles.signOutText, { color: '#FF3B30' }]}>
-              Sign Out
-            </Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={[styles.signOutButton, { backgroundColor: cardColor }]}
+          onPress={handleSignOut}
+          activeOpacity={0.7}
+        >
+          <IconSymbol
+            ios_icon_name="arrow.right.square"
+            android_material_icon_name="logout"
+            size={22}
+            color="#FF3B30"
+          />
+          <Text style={[styles.signOutText, { color: '#FF3B30' }]}>
+            Sign Out
+          </Text>
+        </TouchableOpacity>
 
         {/* App Info */}
         <View style={styles.appInfo}>
@@ -156,7 +268,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: 60,
+    paddingTop: Platform.OS === 'android' ? 48 : 60,
     paddingHorizontal: 20,
   },
   header: {
@@ -170,7 +282,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     borderRadius: 16,
-    marginBottom: 24,
+    marginBottom: 16,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
     elevation: 2,
   },
@@ -209,8 +321,41 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
   },
+  editButton: {
+    padding: 8,
+  },
+  preferencesCard: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+    elevation: 2,
+  },
+  preferenceSection: {
+    marginBottom: 12,
+  },
+  preferenceLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+  },
+  tagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tag: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  tagText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
   authPrompt: {
-    padding: 24,
+    padding: 32,
     borderRadius: 16,
     marginBottom: 24,
     alignItems: 'center',
@@ -220,6 +365,7 @@ const styles = StyleSheet.create({
   authTitle: {
     fontSize: 20,
     fontWeight: '700',
+    marginTop: 16,
     marginBottom: 8,
   },
   authText: {

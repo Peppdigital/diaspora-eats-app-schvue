@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { CartProvider } from '@/contexts/CartContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,22 +25,28 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="welcome" />
-        <Stack.Screen name="auth/customer-auth" />
-        <Stack.Screen name="auth/location-setup" />
-        <Stack.Screen name="auth/vendor-auth" />
-        <Stack.Screen name="vendor-dashboard" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="formsheet" options={{ presentation: 'formSheet' }} />
-        <Stack.Screen name="transparent-modal" options={{ presentation: 'transparentModal' }} />
-      </Stack>
+      <CartProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="welcome" />
+          <Stack.Screen name="auth/customer-auth" />
+          <Stack.Screen name="auth/location-setup" />
+          <Stack.Screen name="auth/vendor-auth" />
+          <Stack.Screen name="vendor-dashboard" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="menu-item-detail" />
+          <Stack.Screen name="checkout" />
+          <Stack.Screen name="order-status" />
+          <Stack.Screen name="favorites" />
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="formsheet" options={{ presentation: 'formSheet' }} />
+          <Stack.Screen name="transparent-modal" options={{ presentation: 'transparentModal' }} />
+        </Stack>
+      </CartProvider>
     </AuthProvider>
   );
 }
