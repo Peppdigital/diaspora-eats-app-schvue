@@ -1,8 +1,7 @@
-
 {
   "expo": {
-    "name": "Jambalaya x Jerk x Jollof",
-    "slug": "jambalaya-jerk-jollof",
+    "name": "Diaspora Eats",
+    "slug": "diaspora-eats",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -37,7 +36,7 @@
       "expo-router",
       "expo-web-browser"
     ],
-    "scheme": "jambalayajerkjollof",
+    "scheme": "diasporaeats",
     "experiments": {
       "typedRoutes": true
     },

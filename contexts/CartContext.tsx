@@ -40,8 +40,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [orderType, setOrderTypeState] = useState<OrderType>('pickup');
-  const [deliveryAddress, setDeliveryAddress] = useState<CartContextType['deliveryAddress']>(null);
-  const [deliveryInstructions, setDeliveryInstructions] = useState('');
+  const [deliveryAddress, setDeliveryAddressState] = useState<CartContextType['deliveryAddress']>(null);
+  const [deliveryInstructions, setDeliveryInstructionsState] = useState('');
 
   const addItem = (menuItem: MenuItem, quantity: number, specialInstructions?: string) => {
     // Check if adding from different vendor
@@ -102,12 +102,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clearCart = () => {
     setItems([]);
     setVendor(null);
-    setDeliveryAddress(null);
-    setDeliveryInstructions('');
+    setDeliveryAddressState(null);
+    setDeliveryInstructionsState('');
   };
 
   const setOrderType = (type: OrderType) => {
     setOrderTypeState(type);
+  };
+
+  const setDeliveryAddress = (address: CartContextType['deliveryAddress']) => {
+    setDeliveryAddressState(address);
+  };
+
+  const setDeliveryInstructions = (instructions: string) => {
+    setDeliveryInstructionsState(instructions);
   };
 
   const getSubtotal = () => {
