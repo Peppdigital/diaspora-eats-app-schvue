@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,24 +8,45 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
+  ActivityIndicator,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
+import { supabase } from '@/app/integrations/supabase/client';
 
 export default function CustomerAuthScreen() {
   const router = useRouter();
-  const { signIn, signUp } = useAuth();
+  const { user, signInWithEmail, signUpWithEmail, signInWithApple, signInWithGoogle } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<'apple' | 'google' | null>(null);
   const [error, setError] = useState('');
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Navigate after auth resolves
+  useEffect(() => {
+    if (user) {
+      console.log('[CustomerAuth] User authenticated, navigating to tabs:', user.email);
+      router.replace('/(tabs)/(home)/');
+    }
+  }, [user]);
+
+  const upsertCustomerProfile = async (userId: string) => {
+    console.log('[CustomerAuth] Upserting customer profile for user:', userId);
+    const { error: upsertError } = await supabase
+      .from('user_profile')
+      .upsert({ user_id: userId, role: 'customer' }, { onConflict: 'user_id', ignoreDuplicates: true });
+    if (upsertError) {
+      console.log('[CustomerAuth] Profile upsert error (non-fatal):', upsertError.message);
+    }
+  };
 
   const handleSubmit = async () => {
     setError('');
@@ -39,9 +60,9 @@ export default function CustomerAuthScreen() {
       console.log('[CustomerAuth] Sign up pressed:', email);
       setLoading(true);
       try {
-        await signUp(email, password, fullName, 'customer');
-        console.log('[CustomerAuth] Sign up success, navigating to tabs');
-        router.replace('/(tabs)/(home)/');
+        await signUpWithEmail(email.trim().toLowerCase(), password, fullName.trim());
+        console.log('[CustomerAuth] Sign up success');
+        // user_profile upsert happens after user state updates via useEffect
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Failed to create account';
         console.log('[CustomerAuth] Sign up error:', msg);
@@ -56,9 +77,8 @@ export default function CustomerAuthScreen() {
       console.log('[CustomerAuth] Sign in pressed:', email);
       setLoading(true);
       try {
-        await signIn(email, password);
-        console.log('[CustomerAuth] Sign in success, navigating to tabs');
-        router.replace('/(tabs)/(home)/');
+        await signInWithEmail(email.trim().toLowerCase(), password);
+        console.log('[CustomerAuth] Sign in success');
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Invalid email or password';
         console.log('[CustomerAuth] Sign in error:', msg);
@@ -68,6 +88,46 @@ export default function CustomerAuthScreen() {
       }
     }
   };
+
+  const handleAppleSignIn = async () => {
+    console.log('[CustomerAuth] Apple sign-in pressed');
+    setError('');
+    setOauthLoading('apple');
+    try {
+      await signInWithApple();
+      console.log('[CustomerAuth] Apple sign-in success');
+      // upsert after user state updates — handled in useEffect via user.id
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Apple sign-in failed';
+      console.log('[CustomerAuth] Apple sign-in error:', msg);
+      if (msg !== 'Authentication cancelled') {
+        setError(msg);
+      }
+    } finally {
+      setOauthLoading(null);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    console.log('[CustomerAuth] Google sign-in pressed');
+    setError('');
+    setOauthLoading('google');
+    try {
+      await signInWithGoogle();
+      console.log('[CustomerAuth] Google sign-in success');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Google sign-in failed';
+      console.log('[CustomerAuth] Google sign-in error:', msg);
+      if (msg !== 'Authentication cancelled') {
+        setError(msg);
+      }
+    } finally {
+      setOauthLoading(null);
+    }
+  };
+
+  const isAnyLoading = loading || oauthLoading !== null;
+  const submitLabel = loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In';
 
   return (
     <KeyboardAvoidingView
@@ -82,7 +142,10 @@ export default function CustomerAuthScreen() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={() => {
+              console.log('[CustomerAuth] Back pressed');
+              router.back();
+            }}
             activeOpacity={0.7}
           >
             <IconSymbol
@@ -103,9 +166,56 @@ export default function CustomerAuthScreen() {
         <View style={styles.form}>
           {error !== '' && (
             <View style={styles.errorBanner}>
+              <IconSymbol
+                ios_icon_name="exclamationmark.circle.fill"
+                android_material_icon_name="error"
+                size={16}
+                color="#FF3B30"
+              />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           )}
+
+          {/* Apple Sign In — must appear first */}
+          <TouchableOpacity
+            style={[styles.appleButton, isAnyLoading && styles.buttonDisabled]}
+            onPress={handleAppleSignIn}
+            disabled={isAnyLoading}
+            activeOpacity={0.85}
+          >
+            {oauthLoading === 'apple' ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <>
+                <Text style={styles.appleIcon}></Text>
+                <Text style={styles.appleButtonText}>Continue with Apple</Text>
+              </>
+            )}
+          </TouchableOpacity>
+
+          {/* Google Sign In */}
+          <TouchableOpacity
+            style={[styles.googleButton, isAnyLoading && styles.buttonDisabled]}
+            onPress={handleGoogleSignIn}
+            disabled={isAnyLoading}
+            activeOpacity={0.85}
+          >
+            {oauthLoading === 'google' ? (
+              <ActivityIndicator color="#1a1a1a" size="small" />
+            ) : (
+              <>
+                <Text style={styles.googleIcon}>G</Text>
+                <Text style={styles.googleButtonText}>Continue with Google</Text>
+              </>
+            )}
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or</Text>
+            <View style={styles.dividerLine} />
+          </View>
 
           {isSignUp && (
             <View style={styles.inputGroup}>
@@ -164,21 +274,29 @@ export default function CustomerAuthScreen() {
           )}
 
           <TouchableOpacity
-            style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+            style={[styles.submitButton, isAnyLoading && styles.buttonDisabled]}
             onPress={handleSubmit}
-            disabled={loading}
+            disabled={isAnyLoading}
             activeOpacity={0.8}
           >
-            <Text style={styles.submitButtonText}>
-              {loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
-            </Text>
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Text style={styles.submitButtonText}>{submitLabel}</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.toggleContainer}>
             <Text style={styles.toggleText}>
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}
             </Text>
-            <TouchableOpacity onPress={() => { setIsSignUp(!isSignUp); setError(''); }}>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('[CustomerAuth] Toggle mode to:', isSignUp ? 'signin' : 'signup');
+                setIsSignUp(!isSignUp);
+                setError('');
+              }}
+            >
               <Text style={styles.toggleLink}>
                 {isSignUp ? 'Sign In' : 'Sign Up'}
               </Text>
@@ -220,18 +338,80 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   form: {
-    gap: 20,
+    gap: 16,
   },
   errorBanner: {
-    backgroundColor: 'rgba(255, 59, 48, 0.15)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255, 59, 48, 0.12)',
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
     borderColor: 'rgba(255, 59, 48, 0.3)',
   },
   errorText: {
+    flex: 1,
     fontSize: 14,
     color: '#FF3B30',
+    fontWeight: '500',
+  },
+  appleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#000000',
+    borderRadius: 12,
+    padding: 16,
+    minHeight: 54,
+  },
+  appleIcon: {
+    fontSize: 20,
+    color: '#FFFFFF',
+    lineHeight: 24,
+  },
+  appleButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    minHeight: 54,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.12)',
+  },
+  googleIcon: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#4285F4',
+  },
+  googleButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginVertical: 4,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.highlight,
+  },
+  dividerText: {
+    fontSize: 14,
+    color: colors.textSecondary,
     fontWeight: '500',
   },
   inputGroup: {
@@ -256,9 +436,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 18,
     alignItems: 'center',
-    marginTop: 12,
+    justifyContent: 'center',
+    minHeight: 56,
+    marginTop: 4,
   },
-  submitButtonDisabled: {
+  buttonDisabled: {
     opacity: 0.6,
   },
   submitButtonText: {
