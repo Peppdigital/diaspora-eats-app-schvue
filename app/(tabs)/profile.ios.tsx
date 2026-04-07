@@ -59,7 +59,7 @@ export default function ProfileScreen() {
                   <View style={styles.locationRow}>
                     <IconSymbol
                       ios_icon_name="location.fill"
-                      android_material_icon_name="location_on"
+                      android_material_icon_name="location-on"
                       size={14}
                       color={textSecondaryColor}
                     />
@@ -98,7 +98,7 @@ export default function ProfileScreen() {
                   <View style={styles.menuItemLeft}>
                     <IconSymbol
                       ios_icon_name={item.icon}
-                      android_material_icon_name={item.icon.replace('.', '_')}
+                      android_material_icon_name={item.icon.replace('.', '-')}
                       size={22}
                       color={colors.primary}
                     />
@@ -108,7 +108,7 @@ export default function ProfileScreen() {
                   </View>
                   <IconSymbol
                     ios_icon_name="chevron.right"
-                    android_material_icon_name="chevron_right"
+                    android_material_icon_name="chevron-right"
                     size={18}
                     color={textSecondaryColor}
                   />

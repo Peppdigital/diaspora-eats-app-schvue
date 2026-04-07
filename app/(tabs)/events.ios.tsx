@@ -72,7 +72,7 @@ export default function EventsScreen() {
     }
   }, []);
 
-  useFocusEffect(fetchEvents);
+  useFocusEffect(useCallback(() => { fetchEvents(); }, [fetchEvents]));
 
   const getEventDate = (e: ApiEvent) => e.start_date || e.start_datetime || '';
   const getEventImage = (e: ApiEvent) => e.image_url || e.hero_image || '';
@@ -150,7 +150,7 @@ export default function EventsScreen() {
               <Text style={[styles.metaText, { color: textSecondaryColor }]}>{dateDisplay}</Text>
             </View>
             <View style={styles.metaRow}>
-              <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location_on" size={14} color={colors.primary} />
+              <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location-on" size={14} color={colors.primary} />
               <Text style={[styles.metaText, { color: textSecondaryColor }]}>{event.city || ''}{event.state ? `, ${event.state}` : ''}</Text>
             </View>
           </View>

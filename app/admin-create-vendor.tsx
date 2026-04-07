@@ -89,7 +89,7 @@ export default function AdminCreateVendorScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow_back" size={24} color={colors.text} />
+              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Create Vendor</Text>
             <View style={{ width: 40 }} />
@@ -113,7 +113,7 @@ export default function AdminCreateVendorScreen() {
                 >
                   <IconSymbol
                     ios_icon_name={type === 'restaurant' ? 'fork.knife' : 'cart.fill'}
-                    android_material_icon_name={type === 'restaurant' ? 'restaurant' : 'shopping_cart'}
+                    android_material_icon_name={type === 'restaurant' ? 'restaurant' : 'shopping-cart'}
                     size={24}
                     color={vendorType === type ? '#FFFFFF' : colors.text}
                   />

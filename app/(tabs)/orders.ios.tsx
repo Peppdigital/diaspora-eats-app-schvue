@@ -56,7 +56,7 @@ export default function OrdersScreen() {
     }
   }, [user]);
 
-  useFocusEffect(fetchOrders);
+  useFocusEffect(useCallback(() => { fetchOrders(); }, [fetchOrders]));
 
   const getStatus = (o: ApiOrder): OrderStatus => (o.status || o.order_status || 'pending') as OrderStatus;
   const getTotal = (o: ApiOrder) => Number(o.total ?? o.total_amount ?? 0);
@@ -101,7 +101,7 @@ export default function OrdersScreen() {
     return (
       <View style={[styles.container, { backgroundColor: bgColor }]}>
         <View style={styles.emptyState}>
-          <IconSymbol ios_icon_name="bag" android_material_icon_name="shopping_bag" size={64} color={textSecondaryColor} />
+          <IconSymbol ios_icon_name="bag" android_material_icon_name="shopping-bag" size={64} color={textSecondaryColor} />
           <Text style={[styles.emptyTitle, { color: textColor }]}>Sign In to View Orders</Text>
           <TouchableOpacity style={[styles.signInButton, { backgroundColor: colors.primary }]} onPress={() => router.push('/auth/customer-auth')}>
             <Text style={styles.signInButtonText}>Sign In</Text>
@@ -187,20 +187,20 @@ export default function OrdersScreen() {
                     <View style={styles.detailRow}>
                       <IconSymbol
                         ios_icon_name={orderType === 'delivery' ? 'car.fill' : 'bag.fill'}
-                        android_material_icon_name={orderType === 'delivery' ? 'local_shipping' : 'shopping_bag'}
+                        android_material_icon_name={orderType === 'delivery' ? 'local-shipping' : 'shopping-bag'}
                         size={14}
                         color={textSecondaryColor}
                       />
                       <Text style={[styles.detailText, { color: textSecondaryColor }]}>{orderType === 'delivery' ? 'Delivery' : 'Pickup'}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <IconSymbol ios_icon_name="dollarsign.circle.fill" android_material_icon_name="attach_money" size={14} color={textSecondaryColor} />
+                      <IconSymbol ios_icon_name="dollarsign.circle.fill" android_material_icon_name="attach-money" size={14} color={textSecondaryColor} />
                       <Text style={[styles.detailText, { color: textSecondaryColor }]}>${totalDisplay}</Text>
                     </View>
                   </View>
                   <View style={styles.viewDetailsRow}>
                     <Text style={[styles.viewDetailsText, { color: colors.primary }]}>View Details</Text>
-                    <IconSymbol ios_icon_name="chevron.right" android_material_icon_name="chevron_right" size={16} color={colors.primary} />
+                    <IconSymbol ios_icon_name="chevron.right" android_material_icon_name="chevron-right" size={16} color={colors.primary} />
                   </View>
                 </TouchableOpacity>
               );
@@ -210,7 +210,7 @@ export default function OrdersScreen() {
 
         {!loading && error === '' && filteredOrders.length === 0 && (
           <View style={styles.emptyState}>
-            <IconSymbol ios_icon_name="bag" android_material_icon_name="shopping_bag" size={64} color={textSecondaryColor} />
+            <IconSymbol ios_icon_name="bag" android_material_icon_name="shopping-bag" size={64} color={textSecondaryColor} />
             <Text style={[styles.emptyTitle, { color: textColor }]}>No Orders Yet</Text>
             <Text style={[styles.emptyText, { color: textSecondaryColor }]}>Start exploring and place your first order!</Text>
           </View>

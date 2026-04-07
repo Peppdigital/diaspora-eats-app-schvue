@@ -144,7 +144,7 @@ export default function EventDetailScreen() {
         <View style={styles.heroContainer}>
           <Image source={{ uri: getEventImage(event) }} style={styles.heroImage} />
           <TouchableOpacity style={[styles.backButton, { backgroundColor: cardColor }]} onPress={() => router.back()} activeOpacity={0.8}>
-            <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow_back" size={24} color={textColor} />
+            <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow-back" size={24} color={textColor} />
           </TouchableOpacity>
           {event.is_featured && (
             <View style={styles.featuredBadge}>
@@ -196,7 +196,7 @@ export default function EventDetailScreen() {
           {!event.is_online && event.venue_address_line1 && (
             <View style={[styles.infoCard, { backgroundColor: cardColor }]}>
               <View style={styles.infoRow}>
-                <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location_on" size={20} color={colors.primary} />
+                <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location-on" size={20} color={colors.primary} />
                 <View style={styles.infoTextContainer}>
                   <Text style={[styles.infoLabel, { color: textSecondaryColor }]}>Location</Text>
                   {event.venue_name && <Text style={[styles.infoValue, { color: textColor }]}>{event.venue_name}</Text>}
@@ -266,7 +266,7 @@ export default function EventDetailScreen() {
             onPress={() => handleRSVP('interested')}
             activeOpacity={0.8}
           >
-            <IconSymbol ios_icon_name="star" android_material_icon_name="star_border" size={18} color={attendeeStatus === 'interested' ? '#FFFFFF' : textColor} />
+            <IconSymbol ios_icon_name="star" android_material_icon_name="star-border" size={18} color={attendeeStatus === 'interested' ? '#FFFFFF' : textColor} />
             <Text style={[styles.rsvpButtonText, { color: attendeeStatus === 'interested' ? '#FFFFFF' : textColor }]}>Interested</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -274,13 +274,13 @@ export default function EventDetailScreen() {
             onPress={() => handleRSVP('going')}
             activeOpacity={0.8}
           >
-            <IconSymbol ios_icon_name="checkmark.circle" android_material_icon_name="check_circle" size={18} color={attendeeStatus === 'going' ? '#FFFFFF' : textColor} />
+            <IconSymbol ios_icon_name="checkmark.circle" android_material_icon_name="check-circle" size={18} color={attendeeStatus === 'going' ? '#FFFFFF' : textColor} />
             <Text style={[styles.rsvpButtonText, { color: attendeeStatus === 'going' ? '#FFFFFF' : textColor }]}>Going</Text>
           </TouchableOpacity>
         </View>
         {event.ticket_url && (
           <TouchableOpacity style={[styles.ticketButton, { backgroundColor: colors.primary }]} onPress={handleGetTickets} activeOpacity={0.8}>
-            <IconSymbol ios_icon_name="ticket.fill" android_material_icon_name="confirmation_number" size={20} color="#FFFFFF" />
+            <IconSymbol ios_icon_name="ticket.fill" android_material_icon_name="confirmation-number" size={20} color="#FFFFFF" />
             <Text style={styles.ticketButtonText}>Get Tickets</Text>
           </TouchableOpacity>
         )}

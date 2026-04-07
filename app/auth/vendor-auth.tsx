@@ -168,7 +168,7 @@ export default function VendorAuthScreen() {
             >
               <IconSymbol
                 ios_icon_name="chevron.left"
-                android_material_icon_name="chevron_left"
+                android_material_icon_name="chevron-left"
                 size={24}
                 color={colors.text}
               />
@@ -187,7 +187,7 @@ export default function VendorAuthScreen() {
             >
               <IconSymbol
                 ios_icon_name="key.fill"
-                android_material_icon_name="vpn_key"
+                android_material_icon_name="vpn-key"
                 size={48}
                 color={colors.primary}
               />
@@ -205,7 +205,7 @@ export default function VendorAuthScreen() {
             >
               <IconSymbol
                 ios_icon_name="plus.circle.fill"
-                android_material_icon_name="add_circle"
+                android_material_icon_name="add-circle"
                 size={48}
                 color={colors.primary}
               />
@@ -240,7 +240,7 @@ export default function VendorAuthScreen() {
             >
               <IconSymbol
                 ios_icon_name="chevron.left"
-                android_material_icon_name="chevron_left"
+                android_material_icon_name="chevron-left"
                 size={24}
                 color={colors.text}
               />
@@ -338,7 +338,7 @@ export default function VendorAuthScreen() {
           >
             <IconSymbol
               ios_icon_name="chevron.left"
-              android_material_icon_name="chevron_left"
+              android_material_icon_name="chevron-left"
               size={24}
               color={colors.text}
             />

@@ -93,7 +93,7 @@ export default function ProfileScreen() {
               <View style={styles.locationRow}>
                 <IconSymbol
                   ios_icon_name="location.fill"
-                  android_material_icon_name="location_on"
+                  android_material_icon_name="location-on"
                   size={14}
                   color={textSecondaryColor}
                 />
@@ -117,15 +117,15 @@ export default function ProfileScreen() {
         </View>
 
         {/* Diaspora & Cuisines */}
-        {(user.diaspora_segment.length > 0 || user.favorite_cuisines.length > 0) && (
+        {((user.diaspora_segment?.length ?? 0) > 0 || (user.favorite_cuisines?.length ?? 0) > 0) && (
           <View style={[styles.preferencesCard, { backgroundColor: cardColor }]}>
-            {user.diaspora_segment.length > 0 && (
+            {(user.diaspora_segment?.length ?? 0) > 0 && (
               <View style={styles.preferenceSection}>
                 <Text style={[styles.preferenceLabel, { color: textSecondaryColor }]}>
                   Diaspora Segment
                 </Text>
                 <View style={styles.tagsRow}>
-                  {user.diaspora_segment.map((segment, index) => (
+                  {user.diaspora_segment?.map((segment, index) => (
                     <View key={index} style={[styles.tag, { backgroundColor: colors.highlight }]}>
                       <Text style={[styles.tagText, { color: colors.secondary }]}>
                         {segment}
@@ -135,13 +135,13 @@ export default function ProfileScreen() {
                 </View>
               </View>
             )}
-            {user.favorite_cuisines.length > 0 && (
+            {(user.favorite_cuisines?.length ?? 0) > 0 && (
               <View style={styles.preferenceSection}>
                 <Text style={[styles.preferenceLabel, { color: textSecondaryColor }]}>
                   Favorite Cuisines
                 </Text>
                 <View style={styles.tagsRow}>
-                  {user.favorite_cuisines.map((cuisine, index) => (
+                  {user.favorite_cuisines?.map((cuisine, index) => (
                     <View key={index} style={[styles.tag, { backgroundColor: colors.highlight }]}>
                       <Text style={[styles.tagText, { color: colors.secondary }]}>
                         {cuisine}
@@ -165,7 +165,7 @@ export default function ProfileScreen() {
               <View style={styles.menuItemLeft}>
                 <IconSymbol
                   ios_icon_name="shield.fill"
-                  android_material_icon_name="admin_panel_settings"
+                  android_material_icon_name="admin-panel-settings"
                   size={22}
                   color={colors.primary}
                 />
@@ -175,7 +175,7 @@ export default function ProfileScreen() {
               </View>
               <IconSymbol
                 ios_icon_name="chevron.right"
-                android_material_icon_name="chevron_right"
+                android_material_icon_name="chevron-right"
                 size={18}
                 color={colors.primary}
               />
@@ -200,7 +200,7 @@ export default function ProfileScreen() {
             </View>
             <IconSymbol
               ios_icon_name="chevron.right"
-              android_material_icon_name="chevron_right"
+              android_material_icon_name="chevron-right"
               size={18}
               color={textSecondaryColor}
             />
@@ -214,7 +214,7 @@ export default function ProfileScreen() {
             <View style={styles.menuItemLeft}>
               <IconSymbol
                 ios_icon_name="location.fill"
-                android_material_icon_name="location_on"
+                android_material_icon_name="location-on"
                 size={22}
                 color={colors.primary}
               />
@@ -224,7 +224,7 @@ export default function ProfileScreen() {
             </View>
             <IconSymbol
               ios_icon_name="chevron.right"
-              android_material_icon_name="chevron_right"
+              android_material_icon_name="chevron-right"
               size={18}
               color={textSecondaryColor}
             />
@@ -248,7 +248,7 @@ export default function ProfileScreen() {
             </View>
             <IconSymbol
               ios_icon_name="chevron.right"
-              android_material_icon_name="chevron_right"
+              android_material_icon_name="chevron-right"
               size={18}
               color={textSecondaryColor}
             />

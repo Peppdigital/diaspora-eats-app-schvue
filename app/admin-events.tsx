@@ -60,7 +60,9 @@ export default function AdminEventsScreen() {
     }
   }, []);
 
-  useFocusEffect(fetchEvents);
+  useFocusEffect(useCallback(() => {
+    fetchEvents();
+  }, [fetchEvents]));
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
@@ -109,7 +111,7 @@ export default function AdminEventsScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow_back" size={24} color={colors.text} />
+              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Events Management</Text>
             <TouchableOpacity style={styles.addButton} onPress={() => {
