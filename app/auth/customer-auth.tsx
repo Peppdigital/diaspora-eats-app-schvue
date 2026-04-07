@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   View,
@@ -15,90 +14,55 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
-import { DiasporaSegment } from '@/types/database.types';
 
 export default function CustomerAuthScreen() {
   const router = useRouter();
   const { signIn, signUp } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // Form fields
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [selectedSegments, setSelectedSegments] = useState<DiasporaSegment[]>([]);
-
-  const diasporaOptions: DiasporaSegment[] = [
-    'African American',
-    'Caribbean',
-    'African',
-    'Pan-African',
-    'Other',
-  ];
-
-  const toggleSegment = (segment: DiasporaSegment) => {
-    if (selectedSegments.includes(segment)) {
-      setSelectedSegments(selectedSegments.filter((s) => s !== segment));
-    } else {
-      setSelectedSegments([...selectedSegments, segment]);
-    }
-  };
 
   const handleSubmit = async () => {
+    setError('');
     if (isSignUp) {
-      // Validation for sign up
-      if (!fullName.trim()) {
-        Alert.alert('Error', 'Please enter your full name');
-        return;
-      }
-      if (!email.trim()) {
-        Alert.alert('Error', 'Please enter your email');
-        return;
-      }
-      if (!password) {
-        Alert.alert('Error', 'Please enter a password');
-        return;
-      }
-      if (password !== confirmPassword) {
-        Alert.alert('Error', 'Passwords do not match');
-        return;
-      }
-      if (password.length < 6) {
-        Alert.alert('Error', 'Password must be at least 6 characters');
-        return;
-      }
+      if (!fullName.trim()) { setError('Please enter your full name'); return; }
+      if (!email.trim()) { setError('Please enter your email'); return; }
+      if (!password) { setError('Please enter a password'); return; }
+      if (password !== confirmPassword) { setError('Passwords do not match'); return; }
+      if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
 
+      console.log('[CustomerAuth] Sign up pressed:', email);
       setLoading(true);
       try {
         await signUp(email, password, fullName, 'customer');
-        // After sign up, redirect to location setup
-        router.replace('/auth/location-setup');
-      } catch (error) {
-        console.error('Sign up error:', error);
-        Alert.alert('Error', 'Failed to create account. Please try again.');
+        console.log('[CustomerAuth] Sign up success, navigating to tabs');
+        router.replace('/(tabs)/(home)/');
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Failed to create account';
+        console.log('[CustomerAuth] Sign up error:', msg);
+        setError(msg);
       } finally {
         setLoading(false);
       }
     } else {
-      // Validation for sign in
-      if (!email.trim()) {
-        Alert.alert('Error', 'Please enter your email');
-        return;
-      }
-      if (!password) {
-        Alert.alert('Error', 'Please enter your password');
-        return;
-      }
+      if (!email.trim()) { setError('Please enter your email'); return; }
+      if (!password) { setError('Please enter your password'); return; }
 
+      console.log('[CustomerAuth] Sign in pressed:', email);
       setLoading(true);
       try {
         await signIn(email, password);
+        console.log('[CustomerAuth] Sign in success, navigating to tabs');
         router.replace('/(tabs)/(home)/');
-      } catch (error) {
-        console.error('Sign in error:', error);
-        Alert.alert('Error', 'Invalid email or password');
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Invalid email or password';
+        console.log('[CustomerAuth] Sign in error:', msg);
+        setError(msg);
       } finally {
         setLoading(false);
       }
@@ -115,7 +79,6 @@ export default function CustomerAuthScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
@@ -133,14 +96,17 @@ export default function CustomerAuthScreen() {
             {isSignUp ? 'Create Account' : 'Welcome Back'}
           </Text>
           <Text style={styles.subtitle}>
-            {isSignUp
-              ? 'Join the diaspora food community'
-              : 'Sign in to continue'}
+            {isSignUp ? 'Join the diaspora food community' : 'Sign in to continue'}
           </Text>
         </View>
 
-        {/* Form */}
         <View style={styles.form}>
+          {error !== '' && (
+            <View style={styles.errorBanner}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
+
           {isSignUp && (
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Full Name</Text>
@@ -183,56 +149,20 @@ export default function CustomerAuthScreen() {
           </View>
 
           {isSignUp && (
-            <>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Confirm Password</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Re-enter your password"
-                  placeholderTextColor={colors.textSecondary}
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry
-                  autoCapitalize="none"
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>
-                  Diaspora Segment (Optional)
-                </Text>
-                <Text style={styles.helperText}>
-                  Select all that apply to personalize your experience
-                </Text>
-                <View style={styles.chipContainer}>
-                  {diasporaOptions.map((segment, index) => (
-                    <React.Fragment key={index}>
-                      <TouchableOpacity
-                        style={[
-                          styles.chip,
-                          selectedSegments.includes(segment) && styles.chipSelected,
-                        ]}
-                        onPress={() => toggleSegment(segment)}
-                        activeOpacity={0.7}
-                      >
-                        <Text
-                          style={[
-                            styles.chipText,
-                            selectedSegments.includes(segment) &&
-                              styles.chipTextSelected,
-                          ]}
-                        >
-                          {segment}
-                        </Text>
-                      </TouchableOpacity>
-                    </React.Fragment>
-                  ))}
-                </View>
-              </View>
-            </>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Confirm Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Re-enter your password"
+                placeholderTextColor={colors.textSecondary}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+                autoCapitalize="none"
+              />
+            </View>
           )}
 
-          {/* Submit Button */}
           <TouchableOpacity
             style={[styles.submitButton, loading && styles.submitButtonDisabled]}
             onPress={handleSubmit}
@@ -240,20 +170,15 @@ export default function CustomerAuthScreen() {
             activeOpacity={0.8}
           >
             <Text style={styles.submitButtonText}>
-              {loading
-                ? 'Please wait...'
-                : isSignUp
-                ? 'Create Account'
-                : 'Sign In'}
+              {loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
             </Text>
           </TouchableOpacity>
 
-          {/* Toggle Sign In/Sign Up */}
           <View style={styles.toggleContainer}>
             <Text style={styles.toggleText}>
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}
             </Text>
-            <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)}>
+            <TouchableOpacity onPress={() => { setIsSignUp(!isSignUp); setError(''); }}>
               <Text style={styles.toggleLink}>
                 {isSignUp ? 'Sign In' : 'Sign Up'}
               </Text>
@@ -297,6 +222,18 @@ const styles = StyleSheet.create({
   form: {
     gap: 20,
   },
+  errorBanner: {
+    backgroundColor: 'rgba(255, 59, 48, 0.15)',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 59, 48, 0.3)',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#FF3B30',
+    fontWeight: '500',
+  },
   inputGroup: {
     gap: 8,
   },
@@ -304,10 +241,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: colors.text,
-  },
-  helperText: {
-    fontSize: 13,
-    color: colors.textSecondary,
   },
   input: {
     backgroundColor: colors.card,
@@ -318,40 +251,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
   },
-  chipContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 4,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.highlight,
-  },
-  chipSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  chipText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  chipTextSelected: {
-    color: '#FFFFFF',
-  },
   submitButton: {
     backgroundColor: colors.primary,
     borderRadius: 12,
     padding: 18,
     alignItems: 'center',
     marginTop: 12,
-    boxShadow: '0px 4px 12px rgba(212, 163, 115, 0.3)',
-    elevation: 4,
   },
   submitButtonDisabled: {
     opacity: 0.6,

@@ -1,111 +1,96 @@
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { api } from '@/utils/api';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, UserRole } from '@/types/database.types';
+export type UserRole = 'customer' | 'vendor' | 'admin';
 
-interface AuthContextType {
-  user: User | null;
+export type AuthUser = {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+  role: UserRole;
+  // Legacy fields used by existing screens
+  full_name: string;
+  default_location_state?: string;
+  default_location_city?: string;
+  diaspora_segment?: string[];
+  favorite_cuisines?: string[];
+};
+
+type AuthContextType = {
+  user: AuthUser | null;
   isLoading: boolean;
+  loading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string, role?: UserRole) => Promise<void>;
+  signUp: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
   signOut: () => Promise<void>;
-  updateUser: (updates: Partial<User>) => Promise<void>;
+  updateUser: (updates: Partial<AuthUser>) => Promise<void>;
+};
+
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+function normalizeUser(raw: Record<string, unknown>): AuthUser {
+  const name = (raw.name as string) || (raw.full_name as string) || '';
+  const role = ((raw.role as string) || 'customer') as UserRole;
+  return {
+    id: raw.id as string,
+    name,
+    full_name: name,
+    email: raw.email as string,
+    image: raw.image as string | undefined,
+    role,
+    default_location_state: raw.default_location_state as string | undefined,
+    default_location_city: raw.default_location_city as string | undefined,
+    diaspora_segment: (raw.diaspora_segment as string[]) || [],
+    favorite_cuisines: (raw.favorite_cuisines as string[]) || [],
+  };
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session
-    checkSession();
+    console.log('[Auth] Restoring session...');
+    api
+      .get('/api-auth-me')
+      .then((data) => {
+        console.log('[Auth] Session restored for:', data?.user?.email);
+        setUser(normalizeUser(data.user));
+      })
+      .catch(() => {
+        console.log('[Auth] No active session');
+        setUser(null);
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
-  const checkSession = async () => {
-    try {
-      // TODO: Implement actual session check with Supabase
-      // For now, simulate loading
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error checking session:', error);
-      setIsLoading(false);
-    }
-  };
-
   const signIn = async (email: string, password: string) => {
-    try {
-      // TODO: Implement actual sign in with Supabase
-      console.log('Signing in:', email);
-      
-      // Mock user for development
-      const mockUser: User = {
-        id: '1',
-        role: 'customer',
-        full_name: 'Test User',
-        email: email,
-        diaspora_segment: ['African American'],
-        favorite_cuisines: ['Soul Food', 'Caribbean'],
-        default_location_state: 'CA',
-        default_location_city: 'Los Angeles',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      
-      setUser(mockUser);
-    } catch (error) {
-      console.error('Error signing in:', error);
-      throw error;
-    }
+    console.log('[Auth] Signing in:', email);
+    const data = await api.post('/auth-login', { email, password });
+    await api.setToken(data.token);
+    setUser(normalizeUser(data.user));
+    console.log('[Auth] Signed in as:', data.user?.email, 'role:', data.user?.role);
   };
 
-  const signUp = async (email: string, password: string, fullName: string, role: UserRole = 'customer') => {
-    try {
-      // TODO: Implement actual sign up with Supabase
-      console.log('Signing up:', email, fullName, role);
-      
-      // Mock user for development
-      const mockUser: User = {
-        id: '1',
-        role: role,
-        full_name: fullName,
-        email: email,
-        diaspora_segment: [],
-        favorite_cuisines: [],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      
-      setUser(mockUser);
-    } catch (error) {
-      console.error('Error signing up:', error);
-      throw error;
-    }
+  const signUp = async (email: string, password: string, name: string, role: UserRole = 'customer') => {
+    console.log('[Auth] Signing up:', email, 'role:', role);
+    const data = await api.post('/auth-signup', { email, password, name, role });
+    await api.setToken(data.token);
+    setUser(normalizeUser(data.user));
+    console.log('[Auth] Signed up as:', data.user?.email);
   };
 
   const signOut = async () => {
-    try {
-      // TODO: Implement actual sign out with Supabase
-      console.log('Signing out');
-      setUser(null);
-    } catch (error) {
-      console.error('Error signing out:', error);
-      throw error;
-    }
+    console.log('[Auth] Signing out');
+    await api.clearToken();
+    setUser(null);
   };
 
-  const updateUser = async (updates: Partial<User>) => {
-    try {
-      // TODO: Implement actual user update with Supabase
-      console.log('Updating user:', updates);
-      if (user) {
-        setUser({ ...user, ...updates, updated_at: new Date().toISOString() });
-      }
-    } catch (error) {
-      console.error('Error updating user:', error);
-      throw error;
+  const updateUser = async (updates: Partial<AuthUser>) => {
+    if (user) {
+      setUser({ ...user, ...updates });
     }
   };
 
@@ -114,6 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         isLoading,
+        loading: isLoading,
         isAuthenticated: !!user,
         signIn,
         signUp,
@@ -127,9 +113,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return useContext(AuthContext);
 }
