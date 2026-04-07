@@ -126,7 +126,7 @@ export default function VendorMenuItemScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow_back" size={24} color={colors.text} />
+              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>{itemId ? 'Edit Menu Item' : 'Add Menu Item'}</Text>
             <View style={{ width: 40 }} />
@@ -139,7 +139,7 @@ export default function VendorMenuItemScreen() {
                 <Image source={{ uri: imageUrl }} style={styles.uploadedImage} />
               ) : (
                 <View style={styles.imagePlaceholder}>
-                  <IconSymbol ios_icon_name="camera.fill" android_material_icon_name="add_a_photo" size={40} color={colors.textSecondary} />
+                  <IconSymbol ios_icon_name="camera.fill" android_material_icon_name="add-a-photo" size={40} color={colors.textSecondary} />
                   <Text style={styles.imagePlaceholderText}>Tap to upload image</Text>
                 </View>
               )}

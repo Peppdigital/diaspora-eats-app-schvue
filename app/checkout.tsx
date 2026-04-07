@@ -114,7 +114,7 @@ export default function CheckoutScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow_back" size={24} color={colors.text} />
+              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Checkout</Text>
             <View style={{ width: 40 }} />
@@ -158,7 +158,7 @@ export default function CheckoutScreen() {
             <Text style={styles.sectionTitle}>Payment Method</Text>
             <View style={styles.paymentCard}>
               <View style={styles.paymentHeader}>
-                <IconSymbol ios_icon_name="creditcard.fill" android_material_icon_name="credit_card" size={24} color={colors.primary} />
+                <IconSymbol ios_icon_name="creditcard.fill" android_material_icon_name="credit-card" size={24} color={colors.primary} />
                 <Text style={styles.paymentLabel}>Card Payment</Text>
               </View>
               <TextInput

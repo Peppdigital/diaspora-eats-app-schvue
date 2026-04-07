@@ -237,7 +237,7 @@ export default function HomeScreen() {
                     <View style={styles.eventInfo}>
                       <Text style={styles.eventTitle} numberOfLines={2}>{event.title}</Text>
                       <View style={styles.eventMeta}>
-                        <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location_on" size={14} color={colors.gold} />
+                        <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location-on" size={14} color={colors.gold} />
                         <Text style={styles.eventLocation}>{event.city || ''}</Text>
                         {ticketLabel !== '' && <Text style={styles.ticketPrice}>{ticketLabel}</Text>}
                       </View>

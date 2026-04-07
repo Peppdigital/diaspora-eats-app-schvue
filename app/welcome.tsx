@@ -63,14 +63,14 @@ export default function WelcomeScreen() {
             >
               <IconSymbol
                 ios_icon_name="fork.knife.circle.fill"
-                android_material_icon_name="restaurant_menu"
+                android_material_icon_name="restaurant-menu"
                 size={28}
                 color="#0D0D0D"
               />
               <Text style={styles.roleButtonText}>I&apos;M HERE TO EAT</Text>
               <IconSymbol
                 ios_icon_name="arrow.right"
-                android_material_icon_name="arrow_forward"
+                android_material_icon_name="arrow-forward"
                 size={24}
                 color="#0D0D0D"
               />
@@ -92,7 +92,7 @@ export default function WelcomeScreen() {
               <Text style={styles.roleButtonTextSecondary}>I&apos;M A VENDOR</Text>
               <IconSymbol
                 ios_icon_name="arrow.right"
-                android_material_icon_name="arrow_forward"
+                android_material_icon_name="arrow-forward"
                 size={24}
                 color={colors.gold}
               />

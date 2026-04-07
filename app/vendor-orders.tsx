@@ -128,7 +128,7 @@ export default function VendorOrdersScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow_back" size={24} color={colors.text} />
+              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Orders</Text>
             <View style={{ width: 40 }} />
@@ -195,14 +195,14 @@ export default function VendorOrdersScreen() {
                       <View style={styles.metaItem}>
                         <IconSymbol
                           ios_icon_name={orderType === 'delivery' ? 'car.fill' : 'bag.fill'}
-                          android_material_icon_name={orderType === 'delivery' ? 'local_shipping' : 'shopping_bag'}
+                          android_material_icon_name={orderType === 'delivery' ? 'local-shipping' : 'shopping-bag'}
                           size={14}
                           color={colors.textSecondary}
                         />
                         <Text style={styles.metaText}>{orderType}</Text>
                       </View>
                       <View style={styles.metaItem}>
-                        <IconSymbol ios_icon_name="dollarsign.circle.fill" android_material_icon_name="attach_money" size={14} color={colors.textSecondary} />
+                        <IconSymbol ios_icon_name="dollarsign.circle.fill" android_material_icon_name="attach-money" size={14} color={colors.textSecondary} />
                         <Text style={styles.metaText}>${total.toFixed(2)}</Text>
                       </View>
                     </View>
@@ -229,7 +229,7 @@ export default function VendorOrdersScreen() {
 
           {!loading && error === '' && filteredOrders.length === 0 && (
             <View style={styles.emptyContainer}>
-              <IconSymbol ios_icon_name="bag" android_material_icon_name="shopping_bag" size={64} color={colors.textSecondary} />
+              <IconSymbol ios_icon_name="bag" android_material_icon_name="shopping-bag" size={64} color={colors.textSecondary} />
               <Text style={styles.emptyTitle}>No Orders</Text>
               <Text style={styles.emptyText}>{filter === 'all' ? 'No orders yet' : `No ${filter} orders`}</Text>
             </View>

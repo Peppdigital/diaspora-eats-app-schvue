@@ -105,7 +105,7 @@ export default function AdminVendorsScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow_back" size={24} color={colors.text} />
+              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Vendor Management</Text>
             <TouchableOpacity style={styles.addButton} onPress={() => {
@@ -176,7 +176,7 @@ export default function AdminVendorsScreen() {
                         <View style={styles.metaItem}>
                           <IconSymbol
                             ios_icon_name={vendor.vendor_type === 'restaurant' ? 'fork.knife' : 'cart.fill'}
-                            android_material_icon_name={vendor.vendor_type === 'restaurant' ? 'restaurant' : 'shopping_cart'}
+                            android_material_icon_name={vendor.vendor_type === 'restaurant' ? 'restaurant' : 'shopping-cart'}
                             size={14}
                             color={colors.textSecondary}
                           />

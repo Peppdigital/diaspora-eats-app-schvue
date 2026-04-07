@@ -145,7 +145,7 @@ export default function HomeScreen() {
               <Text style={[styles.eventMetaText, { color: textSecondaryColor }]} numberOfLines={1}>{dateDisplay}</Text>
             </View>
             <View style={styles.metaRow}>
-              <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location_on" size={12} color={colors.primary} />
+              <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location-on" size={12} color={colors.primary} />
               <Text style={[styles.eventMetaText, { color: textSecondaryColor }]}>{event.city || ''}</Text>
             </View>
           </View>
@@ -171,13 +171,13 @@ export default function HomeScreen() {
             onPress={() => router.push('/auth/location-setup')}
             activeOpacity={0.7}
           >
-            <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location_on" size={20} color={colors.primary} />
+            <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location-on" size={20} color={colors.primary} />
             <Text style={[styles.locationText, { color: textColor }]}>
               {user?.default_location_city && user?.default_location_state
                 ? `${user.default_location_city}, ${user.default_location_state}`
                 : 'Set your location'}
             </Text>
-            <IconSymbol ios_icon_name="chevron.down" android_material_icon_name="expand_more" size={18} color={textSecondaryColor} />
+            <IconSymbol ios_icon_name="chevron.down" android_material_icon_name="expand-more" size={18} color={textSecondaryColor} />
           </TouchableOpacity>
         </View>
 

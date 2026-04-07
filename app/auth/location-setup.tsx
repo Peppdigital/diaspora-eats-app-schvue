@@ -62,7 +62,7 @@ export default function LocationSetupScreen() {
         <View style={styles.header}>
           <IconSymbol
             ios_icon_name="location.fill"
-            android_material_icon_name="location_on"
+            android_material_icon_name="location-on"
             size={64}
             color={colors.primary}
           />

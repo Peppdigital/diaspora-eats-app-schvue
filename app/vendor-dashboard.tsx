@@ -94,17 +94,17 @@ export default function VendorDashboardScreen() {
                 <IconSymbol ios_icon_name="list.bullet" android_material_icon_name="list" size={24} color={colors.primary} />
                 <Text style={styles.actionButtonText}>View Active Orders</Text>
               </View>
-              <IconSymbol ios_icon_name="chevron.right" android_material_icon_name="chevron_right" size={20} color={colors.textSecondary} />
+              <IconSymbol ios_icon_name="chevron.right" android_material_icon_name="chevron-right" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton} onPress={() => {
               console.log('[VendorDashboard] Manage Menu pressed');
               router.push('/vendor-menu');
             }}>
               <View style={styles.actionButtonLeft}>
-                <IconSymbol ios_icon_name="book.fill" android_material_icon_name="menu_book" size={24} color={colors.primary} />
+                <IconSymbol ios_icon_name="book.fill" android_material_icon_name="menu-book" size={24} color={colors.primary} />
                 <Text style={styles.actionButtonText}>Manage Menu</Text>
               </View>
-              <IconSymbol ios_icon_name="chevron.right" android_material_icon_name="chevron_right" size={20} color={colors.textSecondary} />
+              <IconSymbol ios_icon_name="chevron.right" android_material_icon_name="chevron-right" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton} onPress={() => {
               console.log('[VendorDashboard] Vendor Profile pressed');
@@ -114,7 +114,7 @@ export default function VendorDashboardScreen() {
                 <IconSymbol ios_icon_name="building.2.fill" android_material_icon_name="store" size={24} color={colors.primary} />
                 <Text style={styles.actionButtonText}>Vendor Profile</Text>
               </View>
-              <IconSymbol ios_icon_name="chevron.right" android_material_icon_name="chevron_right" size={20} color={colors.textSecondary} />
+              <IconSymbol ios_icon_name="chevron.right" android_material_icon_name="chevron-right" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
 

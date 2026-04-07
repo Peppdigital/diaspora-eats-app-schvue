@@ -80,7 +80,7 @@ export default function CartScreen() {
         <View style={styles.emptyContainer}>
           <IconSymbol 
             ios_icon_name="cart" 
-            android_material_icon_name="shopping_cart"
+            android_material_icon_name="shopping-cart"
             size={64} 
             color={colors.textSecondary}
           />
@@ -125,7 +125,7 @@ export default function CartScreen() {
               >
                 <IconSymbol 
                   ios_icon_name="bag" 
-                  android_material_icon_name="shopping_bag"
+                  android_material_icon_name="shopping-bag"
                   size={20} 
                   color={orderType === 'pickup' ? '#FFFFFF' : colors.text}
                 />
@@ -149,7 +149,7 @@ export default function CartScreen() {
               >
                 <IconSymbol 
                   ios_icon_name="car.fill" 
-                  android_material_icon_name="local_shipping"
+                  android_material_icon_name="local-shipping"
                   size={20} 
                   color={orderType === 'delivery' ? '#FFFFFF' : colors.text}
                 />

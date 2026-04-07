@@ -96,13 +96,13 @@ export default function FavoritesScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow_back" size={24} color={colors.text} />
+              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Favorites</Text>
             <View style={{ width: 40 }} />
           </View>
           <View style={styles.emptyContainer}>
-            <IconSymbol ios_icon_name="heart" android_material_icon_name="favorite_border" size={64} color={colors.textSecondary} />
+            <IconSymbol ios_icon_name="heart" android_material_icon_name="favorite-border" size={64} color={colors.textSecondary} />
             <Text style={styles.emptyTitle}>Sign In to View Favorites</Text>
             <TouchableOpacity style={styles.browseButton} onPress={() => router.push('/auth/customer-auth')}>
               <Text style={styles.browseButtonText}>Sign In</Text>
@@ -119,7 +119,7 @@ export default function FavoritesScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow_back" size={24} color={colors.text} />
+              <IconSymbol ios_icon_name="chevron.left" android_material_icon_name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Favorites</Text>
             <View style={{ width: 40 }} />
@@ -184,13 +184,13 @@ export default function FavoritesScreen() {
                         <View style={styles.vendorMeta}>
                           {vendor.city && (
                             <View style={styles.metaItem}>
-                              <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location_on" size={14} color={colors.textSecondary} />
+                              <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location-on" size={14} color={colors.textSecondary} />
                               <Text style={styles.metaText}>{vendor.city}{vendor.state ? `, ${vendor.state}` : ''}</Text>
                             </View>
                           )}
                           {vendor.offers_delivery && (
                             <View style={styles.metaItem}>
-                              <IconSymbol ios_icon_name="car.fill" android_material_icon_name="local_shipping" size={14} color={colors.textSecondary} />
+                              <IconSymbol ios_icon_name="car.fill" android_material_icon_name="local-shipping" size={14} color={colors.textSecondary} />
                               <Text style={styles.metaText}>Delivery</Text>
                             </View>
                           )}
@@ -208,7 +208,7 @@ export default function FavoritesScreen() {
 
           {!loading && error === '' && favorites.length === 0 && (
             <View style={styles.emptyContainer}>
-              <IconSymbol ios_icon_name="heart" android_material_icon_name="favorite_border" size={64} color={colors.textSecondary} />
+              <IconSymbol ios_icon_name="heart" android_material_icon_name="favorite-border" size={64} color={colors.textSecondary} />
               <Text style={styles.emptyTitle}>No Favorites Yet</Text>
               <Text style={styles.emptyText}>Start exploring and save your favorite restaurants</Text>
               <TouchableOpacity style={styles.browseButton} onPress={() => router.push('/(tabs)/(home)')}>

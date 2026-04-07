@@ -77,7 +77,7 @@ export default function MenuItemDetailScreen() {
           >
             <IconSymbol 
               ios_icon_name="chevron.left" 
-              android_material_icon_name="arrow_back"
+              android_material_icon_name="arrow-back"
               size={24} 
               color={colors.text}
             />
@@ -120,7 +120,7 @@ export default function MenuItemDetailScreen() {
               <View style={[styles.badge, { borderColor: getSpicyColor(menuItem.spicy_level) }]}>
                 <IconSymbol 
                   ios_icon_name="flame.fill" 
-                  android_material_icon_name="local_fire_department"
+                  android_material_icon_name="local-fire-department"
                   size={16} 
                   color={getSpicyColor(menuItem.spicy_level)}
                 />
@@ -155,7 +155,7 @@ export default function MenuItemDetailScreen() {
               <View style={styles.badge}>
                 <IconSymbol 
                   ios_icon_name="checkmark.circle.fill" 
-                  android_material_icon_name="check_circle"
+                  android_material_icon_name="check-circle"
                   size={16} 
                   color="#2196F3"
                 />

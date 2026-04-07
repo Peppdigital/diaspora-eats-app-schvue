@@ -39,7 +39,7 @@ export default function ProfileScreen() {
           <View style={[styles.authPrompt, { backgroundColor: cardColor }]}>
             <IconSymbol
               ios_icon_name="person.circle"
-              android_material_icon_name="account_circle"
+              android_material_icon_name="account-circle"
               size={64}
               color={textSecondaryColor}
             />
@@ -165,7 +165,7 @@ export default function ProfileScreen() {
               <View style={styles.menuItemLeft}>
                 <IconSymbol
                   ios_icon_name="shield.fill"
-                  android_material_icon_name="admin_panel_settings"
+                  android_material_icon_name="admin-panel-settings"
                   size={22}
                   color={colors.primary}
                 />
