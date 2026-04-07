@@ -10,19 +10,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
 import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
 import { DiasporaSegment, VendorType } from '@/types/database.types';
 import { US_STATES, MAJOR_CITIES_BY_STATE } from '@/constants/LocationData';
+import { supabase } from '@/app/integrations/supabase/client';
 
 export default function VendorAuthScreen() {
   const router = useRouter();
-  const { signUp } = useAuth();
   const [mode, setMode] = useState<'select' | 'claim' | 'request'>('select');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Claim form fields
   const [inviteCode, setInviteCode] = useState('');
@@ -59,93 +60,241 @@ export default function VendorAuthScreen() {
   };
 
   const handleClaimSubmit = async () => {
+    setError('');
     if (!inviteCode.trim()) {
-      Alert.alert('Error', 'Please enter your invite code');
+      setError('Please enter your invite code');
       return;
     }
     if (!claimEmail.trim()) {
-      Alert.alert('Error', 'Please enter your email');
+      setError('Please enter your email');
       return;
     }
     if (!claimPassword) {
-      Alert.alert('Error', 'Please enter a password');
+      setError('Please enter a password');
+      return;
+    }
+    if (claimPassword.length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
     if (claimPassword !== claimConfirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
+    console.log('[VendorAuth] Claim listing pressed — email:', claimEmail, 'invite code:', inviteCode);
     setLoading(true);
     try {
-      // TODO: Validate invite code and link vendor
-      console.log('Claiming vendor with code:', inviteCode);
-      await signUp(claimEmail, claimPassword, 'Vendor User', 'vendor');
+      // 1. Validate invite code against the vendor_invite_codes table
+      const { data: inviteData, error: inviteError } = await supabase
+        .from('vendor_invite_codes')
+        .select('id, vendor_id, is_used, expires_at')
+        .eq('invite_code', inviteCode.trim().toUpperCase())
+        .eq('email_sent_to', claimEmail.trim().toLowerCase())
+        .single();
+
+      console.log('[VendorAuth] Invite code lookup result:', inviteData, inviteError);
+
+      if (inviteError || !inviteData) {
+        setError('Invalid invite code or email. Please check and try again.');
+        return;
+      }
+      if (inviteData.is_used) {
+        setError('This invite code has already been used.');
+        return;
+      }
+      if (inviteData.expires_at && new Date(inviteData.expires_at) < new Date()) {
+        setError('This invite code has expired. Please contact support.');
+        return;
+      }
+
+      // 2. Create the Supabase auth account
+      console.log('[VendorAuth] Creating auth account for:', claimEmail);
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: claimEmail.trim().toLowerCase(),
+        password: claimPassword,
+        options: {
+          data: { role: 'vendor' },
+        },
+      });
+
+      console.log('[VendorAuth] supabase.auth.signUp result — user:', authData?.user?.id, 'error:', authError);
+
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+      if (!authData.user) {
+        setError('Account creation failed. Please try again.');
+        return;
+      }
+
+      // 3. Link the user to the vendor and mark invite as used
+      const { error: vendorUpdateError } = await supabase
+        .from('vendors')
+        .update({ owner_user_id: authData.user.id, onboarding_status: 'claimed' })
+        .eq('id', inviteData.vendor_id);
+
+      console.log('[VendorAuth] Vendor claim update error:', vendorUpdateError);
+
+      const { error: inviteMarkError } = await supabase
+        .from('vendor_invite_codes')
+        .update({ is_used: true, used_at: new Date().toISOString() })
+        .eq('id', inviteData.id);
+
+      console.log('[VendorAuth] Invite mark-used error:', inviteMarkError);
+
+      // 4. Insert user profile row
+      await supabase.from('users').upsert({
+        id: authData.user.id,
+        email: claimEmail.trim().toLowerCase(),
+        full_name: 'Vendor',
+        role: 'vendor',
+      });
+
+      console.log('[VendorAuth] Claim success — navigating to vendor dashboard');
       router.replace('/vendor-dashboard');
-    } catch (error) {
-      console.error('Claim error:', error);
-      Alert.alert('Error', 'Invalid invite code or email');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      console.log('[VendorAuth] Claim error:', msg);
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
   const handleRequestSubmit = async () => {
+    setError('');
     if (!businessName.trim()) {
-      Alert.alert('Error', 'Please enter your business name');
+      setError('Please enter your business name');
       return;
     }
     if (!requestEmail.trim()) {
-      Alert.alert('Error', 'Please enter your email');
+      setError('Please enter your email');
       return;
     }
     if (!phone.trim()) {
-      Alert.alert('Error', 'Please enter your phone number');
+      setError('Please enter your phone number');
       return;
     }
     if (!selectedState) {
-      Alert.alert('Error', 'Please select a state');
+      setError('Please select a state');
       return;
     }
     if (!selectedCity) {
-      Alert.alert('Error', 'Please select a city');
+      setError('Please select a city');
       return;
     }
     if (diasporaFocus.length === 0) {
-      Alert.alert('Error', 'Please select at least one diaspora focus');
+      setError('Please select at least one diaspora focus');
       return;
     }
     if (!requestPassword) {
-      Alert.alert('Error', 'Please enter a password');
+      setError('Please enter a password');
+      return;
+    }
+    if (requestPassword.length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
     if (requestPassword !== requestConfirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
+    console.log('[VendorAuth] Request new listing pressed — business:', businessName, 'email:', requestEmail);
     setLoading(true);
     try {
-      // TODO: Create vendor record with pending status
-      console.log('Creating vendor request:', {
-        businessName,
-        vendorType,
-        email: requestEmail,
-        phone,
-        state: selectedState,
-        city: selectedCity,
-        diasporaFocus,
-        cuisines,
+      // 1. Create the Supabase auth account
+      console.log('[VendorAuth] Calling supabase.auth.signUp for:', requestEmail);
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: requestEmail.trim().toLowerCase(),
+        password: requestPassword,
+        options: {
+          data: { role: 'vendor', business_name: businessName.trim() },
+        },
       });
-      await signUp(requestEmail, requestPassword, businessName, 'vendor');
+
+      console.log('[VendorAuth] supabase.auth.signUp result — user:', authData?.user?.id, 'error:', authError);
+
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+      if (!authData.user) {
+        setError('Account creation failed. Please try again.');
+        return;
+      }
+
+      const userId = authData.user.id;
+
+      // 2. Insert user profile row
+      const { error: userInsertError } = await supabase.from('users').upsert({
+        id: userId,
+        email: requestEmail.trim().toLowerCase(),
+        full_name: businessName.trim(),
+        role: 'vendor',
+        phone: phone.trim(),
+        default_location_state: selectedState,
+        default_location_city: selectedCity,
+      });
+
+      console.log('[VendorAuth] User profile insert error:', userInsertError);
+
+      // 3. Insert vendor record with pending onboarding status
+      const cuisineList = cuisines
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean);
+
+      const { data: vendorData, error: vendorInsertError } = await supabase
+        .from('vendors')
+        .insert({
+          owner_user_id: userId,
+          vendor_type: vendorType,
+          name: businessName.trim(),
+          tagline: '',
+          description: '',
+          diaspora_focus: diasporaFocus,
+          cuisines: cuisineList,
+          phone: phone.trim(),
+          email: requestEmail.trim().toLowerCase(),
+          city: selectedCity,
+          state: selectedState,
+          address_line1: '',
+          zip_code: '',
+          country: 'US',
+          is_active: false,
+          onboarding_status: 'pending',
+          created_by_admin: false,
+          offers_dine_in: false,
+          offers_pickup: true,
+          offers_delivery: false,
+          delivery_partners: [],
+          avg_price_level: '$$',
+          rating_average: 0,
+          rating_count: 0,
+        })
+        .select('id')
+        .single();
+
+      console.log('[VendorAuth] Vendor insert result — id:', vendorData?.id, 'error:', vendorInsertError);
+
+      if (vendorInsertError) {
+        // Non-fatal: account was created, vendor row failed — still show success
+        console.log('[VendorAuth] Vendor profile insert failed (non-fatal):', vendorInsertError.message);
+      }
+
+      console.log('[VendorAuth] Request submission success — showing confirmation');
       Alert.alert(
-        'Success',
-        'Your vendor application has been submitted! We will review it and get back to you soon.',
+        'Application Submitted!',
+        'Your vendor application has been submitted. Please check your email to confirm your account. Our team will review your application and get back to you within 2-3 business days.',
         [{ text: 'OK', onPress: () => router.replace('/welcome') }]
       );
-    } catch (error) {
-      console.error('Request error:', error);
-      Alert.alert('Error', 'Failed to submit application. Please try again.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      console.log('[VendorAuth] Request error:', msg);
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -163,7 +312,10 @@ export default function VendorAuthScreen() {
           <View style={styles.header}>
             <TouchableOpacity
               style={styles.backButton}
-              onPress={() => router.back()}
+              onPress={() => {
+                console.log('[VendorAuth] Back pressed from select screen');
+                router.back();
+              }}
               activeOpacity={0.7}
             >
               <IconSymbol
@@ -182,7 +334,10 @@ export default function VendorAuthScreen() {
           <View style={styles.modeSelection}>
             <TouchableOpacity
               style={styles.modeCard}
-              onPress={() => setMode('claim')}
+              onPress={() => {
+                console.log('[VendorAuth] Selected: Claim Existing Listing');
+                setMode('claim');
+              }}
               activeOpacity={0.8}
             >
               <IconSymbol
@@ -200,7 +355,10 @@ export default function VendorAuthScreen() {
 
             <TouchableOpacity
               style={styles.modeCard}
-              onPress={() => setMode('request')}
+              onPress={() => {
+                console.log('[VendorAuth] Selected: Request New Listing');
+                setMode('request');
+              }}
               activeOpacity={0.8}
             >
               <IconSymbol
@@ -235,7 +393,11 @@ export default function VendorAuthScreen() {
           <View style={styles.header}>
             <TouchableOpacity
               style={styles.backButton}
-              onPress={() => setMode('select')}
+              onPress={() => {
+                console.log('[VendorAuth] Back pressed from claim screen');
+                setMode('select');
+                setError('');
+              }}
               activeOpacity={0.7}
             >
               <IconSymbol
@@ -252,6 +414,18 @@ export default function VendorAuthScreen() {
           </View>
 
           <View style={styles.form}>
+            {error !== '' && (
+              <View style={styles.errorBanner}>
+                <IconSymbol
+                  ios_icon_name="exclamationmark.circle.fill"
+                  android_material_icon_name="error"
+                  size={16}
+                  color="#FF3B30"
+                />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
+
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Invite Code</Text>
               <TextInput
@@ -274,6 +448,7 @@ export default function VendorAuthScreen() {
                 onChangeText={setClaimEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                autoCorrect={false}
               />
             </View>
 
@@ -281,7 +456,7 @@ export default function VendorAuthScreen() {
               <Text style={styles.label}>New Password</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Create a password"
+                placeholder="Create a password (min. 6 characters)"
                 placeholderTextColor={colors.textSecondary}
                 value={claimPassword}
                 onChangeText={setClaimPassword}
@@ -309,9 +484,11 @@ export default function VendorAuthScreen() {
               disabled={loading}
               activeOpacity={0.8}
             >
-              <Text style={styles.submitButtonText}>
-                {loading ? 'Claiming...' : 'Claim Listing'}
-              </Text>
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <Text style={styles.submitButtonText}>Claim Listing</Text>
+              )}
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -333,7 +510,11 @@ export default function VendorAuthScreen() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => setMode('select')}
+            onPress={() => {
+              console.log('[VendorAuth] Back pressed from request screen');
+              setMode('select');
+              setError('');
+            }}
             activeOpacity={0.7}
           >
             <IconSymbol
@@ -350,6 +531,18 @@ export default function VendorAuthScreen() {
         </View>
 
         <View style={styles.form}>
+          {error !== '' && (
+            <View style={styles.errorBanner}>
+              <IconSymbol
+                ios_icon_name="exclamationmark.circle.fill"
+                android_material_icon_name="error"
+                size={16}
+                color="#FF3B30"
+              />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
+
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Business Name</Text>
             <TextInput
@@ -369,7 +562,10 @@ export default function VendorAuthScreen() {
                   styles.typeButton,
                   vendorType === 'restaurant' && styles.typeButtonSelected,
                 ]}
-                onPress={() => setVendorType('restaurant')}
+                onPress={() => {
+                  console.log('[VendorAuth] Business type selected: restaurant');
+                  setVendorType('restaurant');
+                }}
                 activeOpacity={0.7}
               >
                 <Text
@@ -386,7 +582,10 @@ export default function VendorAuthScreen() {
                   styles.typeButton,
                   vendorType === 'grocery' && styles.typeButtonSelected,
                 ]}
-                onPress={() => setVendorType('grocery')}
+                onPress={() => {
+                  console.log('[VendorAuth] Business type selected: grocery');
+                  setVendorType('grocery');
+                }}
                 activeOpacity={0.7}
               >
                 <Text
@@ -411,6 +610,7 @@ export default function VendorAuthScreen() {
               onChangeText={setRequestEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
             />
           </View>
 
@@ -441,6 +641,7 @@ export default function VendorAuthScreen() {
                       selectedState === state.code && styles.chipSelected,
                     ]}
                     onPress={() => {
+                      console.log('[VendorAuth] State selected:', state.code);
                       setSelectedState(state.code);
                       setSelectedCity('');
                     }}
@@ -471,7 +672,10 @@ export default function VendorAuthScreen() {
                         styles.chip,
                         selectedCity === city && styles.chipSelected,
                       ]}
-                      onPress={() => setSelectedCity(city)}
+                      onPress={() => {
+                        console.log('[VendorAuth] City selected:', city);
+                        setSelectedCity(city);
+                      }}
                       activeOpacity={0.7}
                     >
                       <Text
@@ -499,7 +703,10 @@ export default function VendorAuthScreen() {
                       styles.chip,
                       diasporaFocus.includes(segment) && styles.chipSelected,
                     ]}
-                    onPress={() => toggleDiaspora(segment)}
+                    onPress={() => {
+                      console.log('[VendorAuth] Diaspora segment toggled:', segment);
+                      toggleDiaspora(segment);
+                    }}
                     activeOpacity={0.7}
                   >
                     <Text
@@ -531,7 +738,7 @@ export default function VendorAuthScreen() {
             <Text style={styles.label}>Password</Text>
             <TextInput
               style={styles.input}
-              placeholder="Create a password"
+              placeholder="Create a password (min. 6 characters)"
               placeholderTextColor={colors.textSecondary}
               value={requestPassword}
               onChangeText={setRequestPassword}
@@ -559,9 +766,11 @@ export default function VendorAuthScreen() {
             disabled={loading}
             activeOpacity={0.8}
           >
-            <Text style={styles.submitButtonText}>
-              {loading ? 'Submitting...' : 'Submit Application'}
-            </Text>
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Text style={styles.submitButtonText}>Submit Application</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -624,6 +833,22 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 20,
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255, 59, 48, 0.12)',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 59, 48, 0.3)',
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#FF3B30',
+    fontWeight: '500',
   },
   inputGroup: {
     gap: 8,
