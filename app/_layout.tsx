@@ -72,6 +72,7 @@ export default function RootLayout() {
           <Stack.Screen name="transparent-modal" options={{ presentation: 'transparentModal' }} />
           <Stack.Screen name="manage-addresses" />
           <Stack.Screen name="edit-profile" />
+          <Stack.Screen name="vendor-detail" />
         </Stack>
       </CartProvider>
     </AuthProvider>
