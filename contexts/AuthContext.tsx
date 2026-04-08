@@ -71,6 +71,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchUser = async () => {
+    try {
+      const session = await authClient.getSession();
+      const sessionUser = session?.data?.user ?? null;
+      setUser(sessionUser as User | null);
+    } catch (error) {
+      console.error("Failed to fetch user session:", error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchUser();
 
@@ -89,25 +102,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-  const data = await api.post('/auth-login', { email, password });
-  const token = data?.token ?? data?.session?.access_token;
-  if (!token) throw new Error('No access token returned from auth-login');
-  await api.setToken(token);
-  setUser(normalizeUser(data.user));
-};
-
-const signUp = async (email: string, password: string, name: string, role: UserRole = 'customer') => {
-  const data = await api.post('/auth-signup', { email, password, name, role });
-  const token = data?.token ?? data?.session?.access_token;
-  if (!token) throw new Error('No access token returned from auth-signup');
-  await api.setToken(token);
-  setUser(normalizeUser(data.user));
-};
+  const signInWithEmail = async (email: string, password: string) => {
+    console.log("signInWithEmail called", { email });
+    try {
+      const { error } = await authClient.signIn.email({ email, password });
+      if (error) {
+        throw new Error(error.message || "Email sign in failed");
+      }
+      await fetchUser();
+    } catch (error) {
+      console.error("Email sign in failed:", error);
+      throw error;
+    }
+  };
 
   const signUpWithEmail = async (email: string, password: string, name?: string) => {
+    console.log("signUpWithEmail called", { email, name });
     try {
-      await authClient.signUp.email({ email, password, name });
+      const { error } = await authClient.signUp.email({ email, password, name });
+      if (error) {
+        throw new Error(error.message || "Email sign up failed");
+      }
       await fetchUser();
     } catch (error) {
       console.error("Email sign up failed:", error);
@@ -116,6 +131,7 @@ const signUp = async (email: string, password: string, name: string, role: UserR
   };
 
   const signInWithSocial = async (provider: string) => {
+    console.log("signInWithSocial called", { provider });
     if (Platform.OS === "web") {
       const token = await openOAuthPopup(provider);
       await setBearerToken(token);
@@ -132,12 +148,16 @@ const signUp = async (email: string, password: string, name: string, role: UserR
     }
   };
 
-  const signInWithGoogle = () => signInWithSocial("google");
+  const signInWithGoogle = () => {
+    console.log("signInWithGoogle called");
+    return signInWithSocial("google");
+  };
 
   const signInWithApple = async () => {
+    console.log("signInWithApple called");
     if (Platform.OS === "ios") {
       // Native Apple Sign In on iOS — shows the system Face ID / password modal
-      const AppleAuthentication = require("expo-apple-authentication");
+      const AppleAuthentication = await import("expo-apple-authentication");
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
           AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
@@ -162,6 +182,7 @@ const signUp = async (email: string, password: string, name: string, role: UserR
   };
 
   const signOut = async () => {
+    console.log("signOut called");
     try {
       await authClient.signOut();
     } catch (error) {
