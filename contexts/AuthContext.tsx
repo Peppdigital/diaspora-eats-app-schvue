@@ -1,18 +1,26 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Platform } from "react-native";
 import * as Linking from "expo-linking";
-import { authClient, setBearerToken, clearAuthTokens } from "@/lib/auth";
+import { API_URL, getBearerToken, setBearerToken, clearAuthTokens } from "@/lib/auth";
 
 interface User {
   id: string;
   email: string;
-  name?: string;
-  image?: string;
+  name?: string | null;
+  image?: string | null;
+  role?: string | null;
+  full_name?: string | null;
+  phone?: string | null;
+  default_location_city?: string | null;
+  default_location_state?: string | null;
+  diaspora_segment?: string[] | null;
+  favorite_cuisines?: string[] | null;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isAuthenticated: boolean;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, name?: string) => Promise<void>;
   signInWithApple: () => Promise<void>;
@@ -71,10 +79,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchUser = async () => {
+    try {
+      const token = await getBearerToken();
+      if (!token) {
+        setUser(null);
+        return;
+      }
+      const res = await fetch(`${API_URL}/functions/v1/api-auth-me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        setUser(null);
+        return;
+      }
+      const data = await res.json();
+      setUser(data.user ?? null);
+    } catch (error) {
+      console.error("Failed to fetch user session:", error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchUser();
 
-    const subscription = Linking.addEventListener("url", (event) => {
+    const subscription = Linking.addEventListener("url", () => {
       console.log("Deep link received, refreshing user session");
       fetchUser();
     });
@@ -89,55 +121,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-  const data = await api.post('/auth-login', { email, password });
-  const token = data?.token ?? data?.session?.access_token;
-  if (!token) throw new Error('No access token returned from auth-login');
-  await api.setToken(token);
-  setUser(normalizeUser(data.user));
-};
-
-const signUp = async (email: string, password: string, name: string, role: UserRole = 'customer') => {
-  const data = await api.post('/auth-signup', { email, password, name, role });
-  const token = data?.token ?? data?.session?.access_token;
-  if (!token) throw new Error('No access token returned from auth-signup');
-  await api.setToken(token);
-  setUser(normalizeUser(data.user));
-};
+  const signInWithEmail = async (email: string, password: string) => {
+    console.log("signInWithEmail called", { email });
+    const res = await fetch(`${API_URL}/functions/v1/auth-login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Email sign in failed");
+    await setBearerToken(data.token);
+    await fetchUser();
+  };
 
   const signUpWithEmail = async (email: string, password: string, name?: string) => {
-    try {
-      await authClient.signUp.email({ email, password, name });
-      await fetchUser();
-    } catch (error) {
-      console.error("Email sign up failed:", error);
-      throw error;
-    }
+    console.log("signUpWithEmail called", { email, name });
+    const res = await fetch(`${API_URL}/functions/v1/auth-signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, name: name ?? "" }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Email sign up failed");
+    await setBearerToken(data.token);
+    await fetchUser();
   };
 
   const signInWithSocial = async (provider: string) => {
+    console.log("signInWithSocial called", { provider });
     if (Platform.OS === "web") {
       const token = await openOAuthPopup(provider);
       await setBearerToken(token);
       await fetchUser();
     } else {
-      const { error } = await authClient.signIn.social({
-        provider,
-        callbackURL: "/auth-callback",
-      });
-      if (error) {
-        throw new Error(error.message || "Social sign in failed");
-      }
-      await fetchUser();
+      // Native social auth via deep link / OAuth redirect
+      const url = `${API_URL}/functions/v1/auth-social?provider=${provider}&callbackURL=diasporaeats://auth-callback`;
+      await Linking.openURL(url);
     }
   };
 
-  const signInWithGoogle = () => signInWithSocial("google");
+  const signInWithGoogle = () => {
+    console.log("signInWithGoogle called");
+    return signInWithSocial("google");
+  };
 
   const signInWithApple = async () => {
+    console.log("signInWithApple called");
     if (Platform.OS === "ios") {
-      // Native Apple Sign In on iOS — shows the system Face ID / password modal
-      const AppleAuthentication = require("expo-apple-authentication");
+      const AppleAuthentication = await import("expo-apple-authentication");
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
           AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
@@ -147,29 +178,24 @@ const signUp = async (email: string, password: string, name: string, role: UserR
       if (!credential.identityToken) {
         throw new Error("No identity token received from Apple");
       }
-      const { error } = await authClient.signIn.social({
-        provider: "apple",
-        idToken: credential.identityToken,
+      const res = await fetch(`${API_URL}/functions/v1/auth-social`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "apple", idToken: credential.identityToken }),
       });
-      if (error) {
-        throw new Error(error.message || "Apple sign in failed");
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Apple sign in failed");
+      await setBearerToken(data.token);
       await fetchUser();
     } else {
-      // Web / Android: OAuth redirect flow
       await signInWithSocial("apple");
     }
   };
 
   const signOut = async () => {
-    try {
-      await authClient.signOut();
-    } catch (error) {
-      console.error("Sign out failed (API):", error);
-    } finally {
-      setUser(null);
-      await clearAuthTokens();
-    }
+    console.log("signOut called");
+    setUser(null);
+    await clearAuthTokens();
   };
 
   return (
@@ -177,6 +203,7 @@ const signUp = async (email: string, password: string, name: string, role: UserR
       value={{
         user,
         loading,
+        isAuthenticated: !!user,
         signInWithEmail,
         signUpWithEmail,
         signInWithApple,

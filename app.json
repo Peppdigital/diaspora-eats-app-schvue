@@ -42,7 +42,8 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {}
+      "router": {},
+      "backendUrl": "https://vitgqdlredogyfuodnfy.supabase.co/functions/v1"
     }
   },
   "scheme": "jambalayajerkjollof"

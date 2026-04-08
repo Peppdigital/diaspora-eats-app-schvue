@@ -11,7 +11,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const theme = useTheme();
   const isDark = theme.dark;
-  const { user, isAuthenticated, signOut } = useAuth();
+  const { user, loading, isAuthenticated, signOut } = useAuth();
 
   const bgColor = isDark ? colors.backgroundDark : colors.background;
   const textColor = isDark ? colors.textDark : colors.text;
@@ -22,6 +22,8 @@ export default function ProfileScreen() {
     await signOut();
     router.replace('/welcome');
   };
+
+  if (loading) return null;
 
   if (!isAuthenticated || !user) {
     return (
@@ -79,12 +81,12 @@ export default function ProfileScreen() {
         <View style={[styles.userCard, { backgroundColor: cardColor }]}>
           <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
             <Text style={styles.avatarText}>
-              {user.full_name.charAt(0).toUpperCase()}
+              {(user.name ?? user.email).charAt(0).toUpperCase()}
             </Text>
           </View>
           <View style={styles.userInfo}>
             <Text style={[styles.userName, { color: textColor }]}>
-              {user.full_name}
+              {user.name ?? user.email}
             </Text>
             <Text style={[styles.userEmail, { color: textSecondaryColor }]}>
               {user.email}
