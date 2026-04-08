@@ -66,7 +66,9 @@ export default function VendorOrdersScreen() {
     }
   }, []);
 
-  useFocusEffect(fetchOrders);
+  useFocusEffect(useCallback(() => {
+    fetchOrders();
+  }, [fetchOrders]));
 
   const getStatus = (o: VendorOrder): OrderStatus => (o.status || o.order_status || 'pending') as OrderStatus;
   const getTotal = (o: VendorOrder) => Number(o.total ?? o.total_amount ?? 0);

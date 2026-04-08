@@ -360,7 +360,7 @@ export default function VendorAuthScreen() {
             >
               <IconSymbol
                 ios_icon_name="chevron.left"
-                android_material_icon_name="chevron_left"
+                android_material_icon_name="chevron-left"
                 size={24}
                 color={colors.text}
               />
@@ -601,7 +601,7 @@ export default function VendorAuthScreen() {
             >
               <IconSymbol
                 ios_icon_name="chevron.left"
-                android_material_icon_name="chevron_left"
+                android_material_icon_name="chevron-left"
                 size={24}
                 color={colors.text}
               />

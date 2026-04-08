@@ -57,7 +57,7 @@ export default function OrdersScreen() {
     }
   }, [user]);
 
-  useFocusEffect(fetchOrders);
+  useFocusEffect(useCallback(() => { fetchOrders(); }, [fetchOrders]));
 
   const getStatus = (o: ApiOrder): OrderStatus => (o.status || o.order_status || 'pending') as OrderStatus;
   const getTotal = (o: ApiOrder) => Number(o.total ?? o.total_amount ?? 0);

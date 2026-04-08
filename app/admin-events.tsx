@@ -60,7 +60,9 @@ export default function AdminEventsScreen() {
     }
   }, []);
 
-  useFocusEffect(fetchEvents);
+  useFocusEffect(useCallback(() => {
+    fetchEvents();
+  }, [fetchEvents]));
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch =

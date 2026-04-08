@@ -108,7 +108,7 @@ export default function ProfileScreen() {
                   </View>
                   <IconSymbol
                     ios_icon_name="chevron.right"
-                    android_material_icon_name="chevron_right"
+                    android_material_icon_name="chevron-right"
                     size={18}
                     color={textSecondaryColor}
                   />

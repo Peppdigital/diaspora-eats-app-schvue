@@ -83,7 +83,9 @@ export default function VendorMenuScreen() {
     }
   }, []);
 
-  useFocusEffect(fetchMenu);
+  useFocusEffect(useCallback(() => {
+    fetchMenu();
+  }, [fetchMenu]));
 
   const handleToggleAvailability = async (itemId: string, currentValue: boolean) => {
     if (!vendorId) return;

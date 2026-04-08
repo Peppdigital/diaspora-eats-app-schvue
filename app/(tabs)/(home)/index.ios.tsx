@@ -77,7 +77,7 @@ export default function HomeScreen() {
     }
   }, []);
 
-  useFocusEffect(fetchData);
+  useFocusEffect(useCallback(() => { fetchData(); }, [fetchData]));
 
   const featuredVendors = vendors.slice(0, 3);
   const upcomingEvents = events.slice(0, 5);

@@ -89,36 +89,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const fetchUser = async () => {
-    try {
-      setLoading(true);
-      const session = await authClient.getSession();
-      if (session?.data?.user) {
-        setUser(session.data.user as User);
-        if (session.data.session?.token) {
-          await setBearerToken(session.data.session.token);
-        }
-      } else {
-        setUser(null);
-        await clearAuthTokens();
-      }
-    } catch (error) {
-      console.error("Failed to fetch user:", error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const signIn = async (email: string, password: string) => {
+  const data = await api.post('/auth-login', { email, password });
+  const token = data?.token ?? data?.session?.access_token;
+  if (!token) throw new Error('No access token returned from auth-login');
+  await api.setToken(token);
+  setUser(normalizeUser(data.user));
+};
 
-  const signInWithEmail = async (email: string, password: string) => {
-    try {
-      await authClient.signIn.email({ email, password });
-      await fetchUser();
-    } catch (error) {
-      console.error("Email sign in failed:", error);
-      throw error;
-    }
-  };
+const signUp = async (email: string, password: string, name: string, role: UserRole = 'customer') => {
+  const data = await api.post('/auth-signup', { email, password, name, role });
+  const token = data?.token ?? data?.session?.access_token;
+  if (!token) throw new Error('No access token returned from auth-signup');
+  await api.setToken(token);
+  setUser(normalizeUser(data.user));
+};
 
   const signUpWithEmail = async (email: string, password: string, name?: string) => {
     try {

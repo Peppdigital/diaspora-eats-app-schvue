@@ -99,7 +99,7 @@ export default function ExploreScreen() {
                   </Text>
                   <IconSymbol
                     ios_icon_name="chevron.right"
-                    android_material_icon_name="chevron_right"
+                    android_material_icon_name="chevron-right"
                     size={18}
                     color={textSecondaryColor}
                   />
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
     fontSize: 15,
-    outlineStyle: 'none',
+    outlineStyle: 'none' as 'solid',
   },
   section: {
     marginBottom: 32,

@@ -54,7 +54,9 @@ export default function AdminVendorsScreen() {
     }
   }, []);
 
-  useFocusEffect(fetchVendors);
+  useFocusEffect(useCallback(() => {
+    fetchVendors();
+  }, [fetchVendors]));
 
   const filteredVendors = vendors.filter((vendor) => {
     const matchesSearch =

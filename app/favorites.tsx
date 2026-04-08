@@ -63,7 +63,9 @@ export default function FavoritesScreen() {
     }
   }, [user]);
 
-  useFocusEffect(fetchFavorites);
+  useFocusEffect(useCallback(() => {
+    fetchFavorites();
+  }, [fetchFavorites]));
 
   const handleRemoveFavorite = (favoriteId: string) => {
     console.log('[Favorites] Remove favorite tapped:', favoriteId);

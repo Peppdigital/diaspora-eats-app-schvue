@@ -37,7 +37,7 @@ export default function FloatingTabBar({ tabs }: FloatingTabBarProps) {
       search: { ios: isActive ? 'magnifyingglass' : 'magnifyingglass', android: 'search' },
       calendar: { ios: isActive ? 'calendar' : 'calendar', android: 'event' },
       map: { ios: isActive ? 'map.fill' : 'map', android: 'map' },
-      receipt: { ios: isActive ? 'bag.fill' : 'bag', android: 'shopping_bag' },
+      receipt: { ios: isActive ? 'bag.fill' : 'bag', android: 'shopping-bag' },
       person: { ios: isActive ? 'person.fill' : 'person', android: 'person' },
     };
 
