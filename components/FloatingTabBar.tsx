@@ -37,7 +37,7 @@ interface FloatingTabBarProps {
 
 const { width: W } = Dimensions.get('window');
 const BAR_HEIGHT = 64;
-const FAB_SIZE = 58;
+const FAB_SIZE = 72;
 const WAVE_WIDTH = 96;   // total width of the dip
 const WAVE_DEPTH = 32;   // depth of the dip
 const FAB_LIFT = 20;     // how far FAB rises above the bar top
@@ -83,19 +83,19 @@ interface TabItemProps {
 }
 
 function TabItem({ tab, isActive, onPress }: TabItemProps) {
-  const scale     = useSharedValue(1);
-  const dotScale  = useSharedValue(isActive ? 1 : 0);
+  const scale          = useSharedValue(1);
+  const indicatorScale = useSharedValue(isActive ? 1 : 0);
 
   useEffect(() => {
-    dotScale.value = withSpring(isActive ? 1 : 0, { damping: 16, stiffness: 200 });
-  }, [isActive]);
+    indicatorScale.value = withSpring(isActive ? 1 : 0, { damping: 14, stiffness: 220 });
+  }, [isActive, indicatorScale]);
 
   const containerAnim = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
-  const dotAnim = useAnimatedStyle(() => ({
-    transform: [{ scale: dotScale.value }],
-    opacity: dotScale.value,
+  const indicatorAnim = useAnimatedStyle(() => ({
+    transform: [{ scaleX: indicatorScale.value }],
+    opacity: indicatorScale.value,
   }));
 
   const entry = ICON_MAP[tab.icon] ?? {
@@ -122,25 +122,31 @@ function TabItem({ tab, isActive, onPress }: TabItemProps) {
         <Text style={[styles.label, { color: isActive ? activeColor : inactiveColor }]}>
           {tab.label}
         </Text>
-        <Animated.View style={[styles.activeDot, { backgroundColor: activeColor }, dotAnim]} />
       </Animated.View>
+      {/* Bottom indicator pill — absolutely positioned so it doesn't affect layout */}
+      <Animated.View style={[styles.activeIndicator, { backgroundColor: activeColor }, indicatorAnim]} />
     </Pressable>
   );
 }
 
 // ─── FAB Button ─────────────────────────────────────────────────────────────
 function FabButton({ onPress, isActive }: { onPress?: () => void; isActive?: boolean }) {
-  const scale = useSharedValue(1);
+  const pressScale  = useSharedValue(1);
+  const activeScale = useSharedValue(isActive ? 1.18 : 1);
+
+  useEffect(() => {
+    activeScale.value = withSpring(isActive ? 1.18 : 1, { damping: 10, stiffness: 160 });
+  }, [isActive, activeScale]);
 
   const fabAnim = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    transform: [{ scale: pressScale.value * activeScale.value }],
   }));
 
   return (
     <Pressable
       onPress={onPress}
-      onPressIn={() => { scale.value = withSpring(0.88, { damping: 12, stiffness: 300 }); }}
-      onPressOut={() => { scale.value = withSpring(1,   { damping: 10, stiffness: 200 }); }}
+      onPressIn={() => { pressScale.value = withSpring(0.88, { damping: 12, stiffness: 300 }); }}
+      onPressOut={() => { pressScale.value = withSpring(1,   { damping: 10, stiffness: 200 }); }}
     >
       <Animated.View style={[styles.fabOuter, fabAnim]}>
         {/* Gradient circle via SVG */}
@@ -158,8 +164,9 @@ function FabButton({ onPress, isActive }: { onPress?: () => void; isActive?: boo
             </LinearGradient>
             {/* Top gloss sheen */}
             <LinearGradient id="gl" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0%"  stopColor="rgba(255,255,255,0.32)" />
-              <Stop offset="60%" stopColor="rgba(255,255,255,0)" />
+              <Stop offset="0%"  stopColor="#FFFFFF" stopOpacity={0.38} />
+              <Stop offset="55%" stopColor="#FFFFFF" stopOpacity={0.08} />
+              <Stop offset="100%" stopColor="#FFFFFF" stopOpacity={0} />
             </LinearGradient>
           </Defs>
           {/* Base circle */}
@@ -325,11 +332,12 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0.4,
   },
-  activeDot: {
-    width: 4,
-    height: 4,
+  activeIndicator: {
+    position: 'absolute',
+    bottom: 8,
+    width: 28,
+    height: 3,
     borderRadius: 2,
-    marginTop: 1,
   },
 
   // FAB
@@ -352,7 +360,7 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   fabIconContainer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
   },

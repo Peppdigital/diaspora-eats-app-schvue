@@ -123,60 +123,144 @@ export type Database = {
           },
         ]
       }
+      event_attendees: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_attendees_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           address: string | null
+          capacity: number | null
           city: string | null
           created_at: string
           created_by: string
+          cuisines_highlighted: string[] | null
           description: string | null
+          diaspora_focus: string[] | null
           end_date: string | null
+          event_type: string | null
           id: string
           image_url: string | null
+          is_all_day: boolean
+          is_featured: boolean
+          is_online: boolean
           is_published: boolean
+          latitude: number | null
+          linked_vendor_id: string | null
           location_name: string | null
+          longitude: number | null
           start_date: string | null
+          state: string | null
+          subtitle: string | null
           tags: string[] | null
           ticket_price: number
+          ticket_required: boolean
           ticket_url: string | null
           title: string
           updated_at: string
+          venue_address_line2: string | null
+          venue_zip: string | null
         }
         Insert: {
           address?: string | null
+          capacity?: number | null
           city?: string | null
           created_at?: string
           created_by: string
+          cuisines_highlighted?: string[] | null
           description?: string | null
+          diaspora_focus?: string[] | null
           end_date?: string | null
+          event_type?: string | null
           id?: string
           image_url?: string | null
+          is_all_day?: boolean
+          is_featured?: boolean
+          is_online?: boolean
           is_published?: boolean
+          latitude?: number | null
+          linked_vendor_id?: string | null
           location_name?: string | null
+          longitude?: number | null
           start_date?: string | null
+          state?: string | null
+          subtitle?: string | null
           tags?: string[] | null
           ticket_price?: number
+          ticket_required?: boolean
           ticket_url?: string | null
           title: string
           updated_at?: string
+          venue_address_line2?: string | null
+          venue_zip?: string | null
         }
         Update: {
           address?: string | null
+          capacity?: number | null
           city?: string | null
           created_at?: string
           created_by?: string
+          cuisines_highlighted?: string[] | null
           description?: string | null
+          diaspora_focus?: string[] | null
           end_date?: string | null
+          event_type?: string | null
           id?: string
           image_url?: string | null
+          is_all_day?: boolean
+          is_featured?: boolean
+          is_online?: boolean
           is_published?: boolean
+          latitude?: number | null
+          linked_vendor_id?: string | null
           location_name?: string | null
+          longitude?: number | null
           start_date?: string | null
+          state?: string | null
+          subtitle?: string | null
           tags?: string[] | null
           ticket_price?: number
+          ticket_required?: boolean
           ticket_url?: string | null
           title?: string
           updated_at?: string
+          venue_address_line2?: string | null
+          venue_zip?: string | null
         }
         Relationships: [
           {
@@ -184,6 +268,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "user"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_linked_vendor_id_fkey"
+            columns: ["linked_vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -308,14 +399,20 @@ export type Database = {
         Row: {
           category_id: string | null
           created_at: string
+          cuisine_tag: string | null
           description: string | null
+          diaspora_segment_tag: string | null
           id: string
           image_url: string | null
           is_available: boolean
           is_featured: boolean
+          is_gluten_free: boolean
+          is_vegan: boolean
+          is_vegetarian: boolean
           name: string
           price: number
           sort_order: number
+          spicy_level: string
           tags: string[] | null
           updated_at: string
           vendor_id: string
@@ -323,14 +420,20 @@ export type Database = {
         Insert: {
           category_id?: string | null
           created_at?: string
+          cuisine_tag?: string | null
           description?: string | null
+          diaspora_segment_tag?: string | null
           id?: string
           image_url?: string | null
           is_available?: boolean
           is_featured?: boolean
+          is_gluten_free?: boolean
+          is_vegan?: boolean
+          is_vegetarian?: boolean
           name: string
           price: number
           sort_order?: number
+          spicy_level?: string
           tags?: string[] | null
           updated_at?: string
           vendor_id: string
@@ -338,14 +441,20 @@ export type Database = {
         Update: {
           category_id?: string | null
           created_at?: string
+          cuisine_tag?: string | null
           description?: string | null
+          diaspora_segment_tag?: string | null
           id?: string
           image_url?: string | null
           is_available?: boolean
           is_featured?: boolean
+          is_gluten_free?: boolean
+          is_vegan?: boolean
+          is_vegetarian?: boolean
           name?: string
           price?: number
           sort_order?: number
+          spicy_level?: string
           tags?: string[] | null
           updated_at?: string
           vendor_id?: string
@@ -370,6 +479,7 @@ export type Database = {
       order_items: {
         Row: {
           id: string
+          line_total: number | null
           menu_item_id: string
           name: string
           order_id: string
@@ -379,6 +489,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          line_total?: number | null
           menu_item_id: string
           name: string
           order_id: string
@@ -388,6 +499,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          line_total?: number | null
           menu_item_id?: string
           name?: string
           order_id?: string
@@ -416,12 +528,24 @@ export type Database = {
         Row: {
           created_at: string
           delivery_address: string
+          delivery_address_line2: string | null
+          delivery_city: string | null
           delivery_fee: number
           delivery_instructions: string | null
+          delivery_state: string | null
+          delivery_zip: string | null
           estimated_delivery_time: string | null
+          estimated_ready_time: string | null
           id: string
+          order_number: string | null
+          order_type: string
+          payment_provider: string | null
+          payment_reference_id: string | null
+          payment_status: string
+          service_fee: number
           status: string
           subtotal: number
+          tax_amount: number
           total: number
           updated_at: string
           user_id: string
@@ -430,12 +554,24 @@ export type Database = {
         Insert: {
           created_at?: string
           delivery_address: string
+          delivery_address_line2?: string | null
+          delivery_city?: string | null
           delivery_fee: number
           delivery_instructions?: string | null
+          delivery_state?: string | null
+          delivery_zip?: string | null
           estimated_delivery_time?: string | null
+          estimated_ready_time?: string | null
           id?: string
+          order_number?: string | null
+          order_type?: string
+          payment_provider?: string | null
+          payment_reference_id?: string | null
+          payment_status?: string
+          service_fee?: number
           status?: string
           subtotal: number
+          tax_amount?: number
           total: number
           updated_at?: string
           user_id: string
@@ -444,12 +580,24 @@ export type Database = {
         Update: {
           created_at?: string
           delivery_address?: string
+          delivery_address_line2?: string | null
+          delivery_city?: string | null
           delivery_fee?: number
           delivery_instructions?: string | null
+          delivery_state?: string | null
+          delivery_zip?: string | null
           estimated_delivery_time?: string | null
+          estimated_ready_time?: string | null
           id?: string
+          order_number?: string | null
+          order_type?: string
+          payment_provider?: string | null
+          payment_reference_id?: string | null
+          payment_status?: string
+          service_fee?: number
           status?: string
           subtotal?: number
+          tax_amount?: number
           total?: number
           updated_at?: string
           user_id?: string
@@ -465,6 +613,58 @@ export type Database = {
           },
           {
             foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          comment: string
+          created_at: string
+          customer_id: string
+          id: string
+          order_id: string
+          rating: number
+          vendor_id: string
+        }
+        Insert: {
+          comment?: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          order_id: string
+          rating: number
+          vendor_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          order_id?: string
+          rating?: number
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_vendor_id_fkey"
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors"
@@ -512,6 +712,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      states_and_cities: {
+        Row: {
+          city_name: string
+          id: string
+          is_major_city: boolean
+          sort_order: number
+          state_code: string
+          state_name: string
+        }
+        Insert: {
+          city_name: string
+          id?: string
+          is_major_city?: boolean
+          sort_order?: number
+          state_code: string
+          state_name: string
+        }
+        Update: {
+          city_name?: string
+          id?: string
+          is_major_city?: boolean
+          sort_order?: number
+          state_code?: string
+          state_name?: string
+        }
+        Relationships: []
       }
       user: {
         Row: {
@@ -599,66 +826,176 @@ export type Database = {
           },
         ]
       }
+      vendor_invite_codes: {
+        Row: {
+          created_at: string
+          email_sent_to: string
+          expires_at: string | null
+          id: string
+          invite_code: string
+          is_used: boolean
+          used_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_sent_to: string
+          expires_at?: string | null
+          id?: string
+          invite_code: string
+          is_used?: boolean
+          used_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          email_sent_to?: string
+          expires_at?: string | null
+          id?: string
+          invite_code?: string
+          is_used?: boolean
+          used_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_invite_codes_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendors: {
         Row: {
           address: string | null
+          address_line1: string | null
+          address_line2: string | null
+          avg_price_level: string | null
           banner_url: string | null
           city: string | null
+          country: string | null
           created_at: string
+          created_by_admin: boolean
           cuisine_type: string | null
+          cuisines: string[] | null
           delivery_fee: number
+          delivery_partners: string[]
           description: string | null
+          diaspora_focus: string[] | null
+          email: string | null
           estimated_delivery_time: string | null
           id: string
+          instagram_handle: string | null
           is_active: boolean
           is_featured: boolean
+          latitude: number | null
           logo_url: string | null
+          longitude: number | null
           min_order: number
           name: string
+          offers_delivery: boolean
+          offers_dine_in: boolean
+          offers_pickup: boolean
+          onboarding_status: string | null
+          opening_hours: string | null
+          phone: string | null
           rating: number
           review_count: number
+          state: string | null
+          tagline: string | null
           updated_at: string
           user_id: string
+          vendor_type: string | null
+          website_url: string | null
+          zip_code: string | null
         }
         Insert: {
           address?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          avg_price_level?: string | null
           banner_url?: string | null
           city?: string | null
+          country?: string | null
           created_at?: string
+          created_by_admin?: boolean
           cuisine_type?: string | null
+          cuisines?: string[] | null
           delivery_fee?: number
+          delivery_partners?: string[]
           description?: string | null
+          diaspora_focus?: string[] | null
+          email?: string | null
           estimated_delivery_time?: string | null
           id?: string
+          instagram_handle?: string | null
           is_active?: boolean
           is_featured?: boolean
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           min_order?: number
           name: string
+          offers_delivery?: boolean
+          offers_dine_in?: boolean
+          offers_pickup?: boolean
+          onboarding_status?: string | null
+          opening_hours?: string | null
+          phone?: string | null
           rating?: number
           review_count?: number
+          state?: string | null
+          tagline?: string | null
           updated_at?: string
           user_id: string
+          vendor_type?: string | null
+          website_url?: string | null
+          zip_code?: string | null
         }
         Update: {
           address?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          avg_price_level?: string | null
           banner_url?: string | null
           city?: string | null
+          country?: string | null
           created_at?: string
+          created_by_admin?: boolean
           cuisine_type?: string | null
+          cuisines?: string[] | null
           delivery_fee?: number
+          delivery_partners?: string[]
           description?: string | null
+          diaspora_focus?: string[] | null
+          email?: string | null
           estimated_delivery_time?: string | null
           id?: string
+          instagram_handle?: string | null
           is_active?: boolean
           is_featured?: boolean
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           min_order?: number
           name?: string
+          offers_delivery?: boolean
+          offers_dine_in?: boolean
+          offers_pickup?: boolean
+          onboarding_status?: string | null
+          opening_hours?: string | null
+          phone?: string | null
           rating?: number
           review_count?: number
+          state?: string | null
+          tagline?: string | null
           updated_at?: string
           user_id?: string
+          vendor_type?: string | null
+          website_url?: string | null
+          zip_code?: string | null
         }
         Relationships: [
           {

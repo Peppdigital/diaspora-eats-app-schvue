@@ -4,6 +4,7 @@ import { Stack } from "expo-router";
 import { ScrollView, StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { colors } from "@/styles/commonStyles";
+import { GradientFill } from "@/components/GradientFill";
 import { IconSymbol } from "@/components/IconSymbol";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -79,9 +80,10 @@ export default function ProfileScreen() {
                 Create an account or sign in to access your profile and orders
               </Text>
               <TouchableOpacity
-                style={[styles.authButton, { backgroundColor: colors.primary }]}
+                style={styles.authButton}
                 activeOpacity={0.7}
               >
+                <GradientFill borderRadius={12} />
                 <Text style={styles.authButtonText}>Sign In / Sign Up</Text>
               </TouchableOpacity>
             </View>
@@ -225,12 +227,18 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   authButton: {
+    backgroundColor: 'transparent',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 12,
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 6,
   },
   authButtonText: {
-    color: '#FFFFFF',
+    color: '#1A1000',
     fontSize: 16,
     fontWeight: '700',
   },

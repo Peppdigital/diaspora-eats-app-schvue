@@ -16,6 +16,7 @@ import { router } from 'expo-router';
 import { authenticatedGet, authenticatedPost, authenticatedPatch, authenticatedDelete } from '@/utils/api';
 import { ChevronLeft, Plus, Pencil, Trash2, MapPin, Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
+import { GradientFill } from '@/components/GradientFill';
 
 interface Address {
   id: string;
@@ -248,9 +249,10 @@ export default function ManageAddressesScreen() {
           </Text>
           <TouchableOpacity
             onPress={loadAddresses}
-            style={{ backgroundColor: '#D4AF37', borderRadius: 10, paddingHorizontal: 24, paddingVertical: 12 }}
+            style={{ backgroundColor: 'transparent', borderRadius: 10, paddingHorizontal: 24, paddingVertical: 12, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 }}
           >
-            <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: 14, color: '#0D0D0D' }}>Try Again</Text>
+            <GradientFill borderRadius={10} />
+            <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: 14, color: '#1A1000' }}>Try Again</Text>
           </TouchableOpacity>
         </View>
       ) : addresses.length === 0 ? (
@@ -264,9 +266,10 @@ export default function ManageAddressesScreen() {
           </Text>
           <TouchableOpacity
             onPress={openAddSheet}
-            style={{ backgroundColor: '#D4AF37', borderRadius: 12, paddingHorizontal: 28, paddingVertical: 14 }}
+            style={{ backgroundColor: 'transparent', borderRadius: 12, paddingHorizontal: 28, paddingVertical: 14, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 }}
           >
-            <Text style={{ fontFamily: 'Montserrat-SemiBold', fontSize: 14, color: '#0D0D0D', letterSpacing: 0.5 }}>
+            <GradientFill borderRadius={12} />
+            <Text style={{ fontFamily: 'Montserrat-SemiBold', fontSize: 14, color: '#1A1000', letterSpacing: 0.5 }}>
               Add your first address
             </Text>
           </TouchableOpacity>
@@ -402,19 +405,25 @@ export default function ManageAddressesScreen() {
                             paddingVertical: 9,
                             borderRadius: 20,
                             borderWidth: 1,
-                            borderColor: isSelected ? '#D4AF37' : '#333333',
-                            backgroundColor: isSelected ? 'rgba(212,175,55,0.12)' : '#252525',
+                            borderColor: isSelected ? '#9C7C1A' : '#333333',
+                            backgroundColor: isSelected ? 'transparent' : '#252525',
                             flexDirection: 'row',
                             alignItems: 'center',
                             gap: 6,
+                            shadowColor: isSelected ? '#D4AF37' : 'transparent',
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: isSelected ? 0.45 : 0,
+                            shadowRadius: 4,
+                            elevation: isSelected ? 4 : 0,
                           }}
                         >
-                          {isSelected && <Check color="#D4AF37" size={13} />}
+                          {isSelected && <GradientFill borderRadius={20} />}
+                          {isSelected && <Check color="#1A1000" size={13} />}
                           <Text
                             style={{
                               fontFamily: 'Poppins-Medium',
                               fontSize: 13,
-                              color: isSelected ? '#D4AF37' : '#A0A0A0',
+                              color: isSelected ? '#1A1000' : '#A0A0A0',
                             }}
                           >
                             {preset}
@@ -648,7 +657,7 @@ export default function ManageAddressesScreen() {
                   disabled={savingAddress}
                   activeOpacity={0.85}
                   style={{
-                    backgroundColor: savingAddress ? '#8B7320' : '#D4AF37',
+                    backgroundColor: 'transparent',
                     borderRadius: 12,
                     paddingVertical: 16,
                     alignItems: 'center',
@@ -656,8 +665,15 @@ export default function ManageAddressesScreen() {
                     justifyContent: 'center',
                     gap: 10,
                     marginBottom: 4,
+                    opacity: savingAddress ? 0.6 : 1,
+                    shadowColor: '#D4AF37',
+                    shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: 0.5,
+                    shadowRadius: 8,
+                    elevation: 6,
                   }}
                 >
+                  {!savingAddress && <GradientFill borderRadius={12} />}
                   {savingAddress && <ActivityIndicator color="#0D0D0D" size="small" />}
                   <Text
                     style={{

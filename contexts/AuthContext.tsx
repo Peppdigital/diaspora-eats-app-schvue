@@ -21,12 +21,12 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
-  signInWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string, name?: string) => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<User | null>;
+  signUpWithEmail: (email: string, password: string, name?: string) => Promise<User | null>;
   signInWithApple: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
-  fetchUser: () => Promise<void>;
+  fetchUser: () => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -79,25 +79,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
+  const fetchUser = async (): Promise<User | null> => {
     try {
       const token = await getBearerToken();
       if (!token) {
         setUser(null);
-        return;
+        return null;
       }
       const res = await fetch(`${API_URL}/functions/v1/api-auth-me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
         setUser(null);
-        return;
+        return null;
       }
       const data = await res.json();
-      setUser(data.user ?? null);
+      const u: User | null = data.user ?? null;
+      setUser(u);
+      return u;
     } catch (error) {
       console.error("Failed to fetch user session:", error);
       setUser(null);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -121,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signInWithEmail = async (email: string, password: string) => {
+  const signInWithEmail = async (email: string, password: string): Promise<User | null> => {
     console.log("signInWithEmail called", { email });
     const res = await fetch(`${API_URL}/functions/v1/auth-login`, {
       method: "POST",
@@ -131,10 +134,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Email sign in failed");
     await setBearerToken(data.token);
-    await fetchUser();
+    return fetchUser();
   };
 
-  const signUpWithEmail = async (email: string, password: string, name?: string) => {
+  const signUpWithEmail = async (email: string, password: string, name?: string): Promise<User | null> => {
     console.log("signUpWithEmail called", { email, name });
     const res = await fetch(`${API_URL}/functions/v1/auth-signup`, {
       method: "POST",
@@ -144,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Email sign up failed");
     await setBearerToken(data.token);
-    await fetchUser();
+    return fetchUser();
   };
 
   const signInWithSocial = async (provider: string) => {

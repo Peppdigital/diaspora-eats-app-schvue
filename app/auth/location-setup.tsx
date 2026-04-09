@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { colors } from '@/styles/commonStyles';
+import { GradientFill } from '@/components/GradientFill';
 import { IconSymbol } from '@/components/IconSymbol';
 import { US_STATES, MAJOR_CITIES_BY_STATE } from '@/constants/LocationData';
 
@@ -89,6 +90,7 @@ export default function LocationSetupScreen() {
                   }}
                   activeOpacity={0.7}
                 >
+                  {selectedState === state.code && <GradientFill borderRadius={12} />}
                   <Text
                     style={[
                       styles.optionText,
@@ -118,6 +120,7 @@ export default function LocationSetupScreen() {
                     onPress={() => setSelectedCity(city)}
                     activeOpacity={0.7}
                   >
+                    {selectedCity === city && <GradientFill borderRadius={12} />}
                     <Text
                       style={[
                         styles.optionText,
@@ -145,6 +148,7 @@ export default function LocationSetupScreen() {
             disabled={!selectedState || !selectedCity || loading}
             activeOpacity={0.8}
           >
+            {!loading && selectedState && selectedCity && <GradientFill borderRadius={12} />}
             <Text style={styles.continueButtonText}>
               {loading ? 'Saving...' : 'Continue'}
             </Text>
@@ -211,8 +215,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optionButtonSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: 'transparent',
+    borderColor: '#9C7C1A',
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
   },
   optionText: {
     fontSize: 16,
@@ -220,19 +229,22 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   optionTextSelected: {
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
   buttonContainer: {
     gap: 12,
     marginTop: 20,
   },
   continueButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: 'transparent',
     borderRadius: 12,
     padding: 18,
     alignItems: 'center',
-    boxShadow: '0px 4px 12px rgba(212, 163, 115, 0.3)',
-    elevation: 4,
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 6,
   },
   continueButtonDisabled: {
     opacity: 0.5,
@@ -240,7 +252,7 @@ const styles = StyleSheet.create({
   continueButtonText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
   skipButton: {
     padding: 18,

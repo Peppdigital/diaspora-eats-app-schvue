@@ -15,6 +15,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
 import { useAuth } from '@/contexts/AuthContext';
+import { GradientFill } from '@/components/GradientFill';
 import { api } from '@/utils/api';
 import * as Haptics from 'expo-haptics';
 
@@ -107,6 +108,7 @@ export default function FavoritesScreen() {
             <IconSymbol ios_icon_name="heart" android_material_icon_name="favorite-border" size={64} color={colors.textSecondary} />
             <Text style={styles.emptyTitle}>Sign In to View Favorites</Text>
             <TouchableOpacity style={styles.browseButton} onPress={() => router.push('/auth/customer-auth')}>
+              <GradientFill borderRadius={12} />
               <Text style={styles.browseButtonText}>Sign In</Text>
             </TouchableOpacity>
           </View>
@@ -133,6 +135,7 @@ export default function FavoritesScreen() {
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>{error}</Text>
               <TouchableOpacity style={styles.browseButton} onPress={fetchFavorites}>
+                <GradientFill borderRadius={12} />
                 <Text style={styles.browseButtonText}>Retry</Text>
               </TouchableOpacity>
             </View>
@@ -214,6 +217,7 @@ export default function FavoritesScreen() {
               <Text style={styles.emptyTitle}>No Favorites Yet</Text>
               <Text style={styles.emptyText}>Start exploring and save your favorite restaurants</Text>
               <TouchableOpacity style={styles.browseButton} onPress={() => router.push('/(tabs)/(home)')}>
+                <GradientFill borderRadius={12} />
                 <Text style={styles.browseButtonText}>Browse Vendors</Text>
               </TouchableOpacity>
             </View>
@@ -255,6 +259,6 @@ const styles = StyleSheet.create({
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 80 },
   emptyTitle: { fontSize: 24, fontWeight: '700', color: colors.text, marginTop: 20, marginBottom: 8 },
   emptyText: { fontSize: 16, color: colors.textSecondary, textAlign: 'center', marginBottom: 24, paddingHorizontal: 40 },
-  browseButton: { backgroundColor: colors.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  browseButtonText: { fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
+  browseButton: { backgroundColor: 'transparent', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
+  browseButtonText: { fontSize: 16, fontWeight: '600', color: '#1A1000' },
 });

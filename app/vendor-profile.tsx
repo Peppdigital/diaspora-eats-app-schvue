@@ -15,6 +15,7 @@ import {
 import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
+import { GradientFill } from '@/components/GradientFill';
 import { Vendor, DiasporaSegment, PriceLevel } from '@/types/database.types';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
@@ -362,6 +363,7 @@ export default function VendorProfileScreen() {
                     ]}
                     onPress={() => toggleDiasporaFocus(segment)}
                   >
+                    {diasporaFocus.includes(segment) && <GradientFill borderRadius={20} />}
                     <Text
                       style={[
                         styles.chipText,
@@ -386,6 +388,7 @@ export default function VendorProfileScreen() {
                     ]}
                     onPress={() => toggleCuisine(cuisine)}
                   >
+                    {cuisines.includes(cuisine) && <GradientFill borderRadius={20} />}
                     <Text
                       style={[
                         styles.chipText,
@@ -410,6 +413,7 @@ export default function VendorProfileScreen() {
                     ]}
                     onPress={() => setPriceLevel(level)}
                   >
+                    {priceLevel === level && <GradientFill borderRadius={20} />}
                     <Text
                       style={[
                         styles.chipText,
@@ -478,6 +482,7 @@ export default function VendorProfileScreen() {
                       ]}
                       onPress={() => toggleDeliveryPartner(partner)}
                     >
+                      {selectedDeliveryPartners.includes(partner) && <GradientFill borderRadius={20} />}
                       <Text
                         style={[
                           styles.chipText,
@@ -511,6 +516,7 @@ export default function VendorProfileScreen() {
 
           {/* Save Button */}
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <GradientFill borderRadius={12} />
             <Text style={styles.saveButtonText}>Save Profile</Text>
           </TouchableOpacity>
 
@@ -661,8 +667,13 @@ const styles = StyleSheet.create({
     borderColor: colors.highlight,
   },
   chipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: 'transparent',
+    borderColor: '#9C7C1A',
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
   },
   chipText: {
     fontSize: 14,
@@ -670,7 +681,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   chipTextActive: {
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
   toggleRow: {
     flexDirection: 'row',
@@ -689,16 +700,19 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   saveButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: 'transparent',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
-    elevation: 2,
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 6,
   },
   saveButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
 });

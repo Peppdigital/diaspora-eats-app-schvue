@@ -15,6 +15,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
+import { GradientFill } from '@/components/GradientFill';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
 import { api } from '@/utils/api';
@@ -180,6 +181,7 @@ export default function VendorMenuItemScreen() {
                     style={[styles.chip, spicyLevel === level && styles.chipActive]}
                     onPress={() => setSpicyLevel(level)}
                   >
+                    {spicyLevel === level && <GradientFill borderRadius={20} />}
                     <Text style={[styles.chipText, spicyLevel === level && styles.chipTextActive]}>{level}</Text>
                   </TouchableOpacity>
                 ))}
@@ -206,6 +208,7 @@ export default function VendorMenuItemScreen() {
           </View>
 
           <TouchableOpacity style={[styles.saveButton, loading && { opacity: 0.6 }]} onPress={handleSave} disabled={loading}>
+            {!loading && <GradientFill borderRadius={12} />}
             <Text style={styles.saveButtonText}>{loading ? 'Saving...' : 'Save Menu Item'}</Text>
           </TouchableOpacity>
 
@@ -236,12 +239,12 @@ const styles = StyleSheet.create({
   chipScroll: { marginHorizontal: -20, paddingHorizontal: 20 },
   chipContainer: { flexDirection: 'row', gap: 8 },
   chip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.highlight },
-  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipActive: { backgroundColor: 'transparent', borderColor: '#9C7C1A', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
   chipText: { fontSize: 14, fontWeight: '600', color: colors.text },
-  chipTextActive: { color: '#FFFFFF' },
+  chipTextActive: { color: '#1A1000' },
   toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: colors.card, borderRadius: 8, padding: 16, marginBottom: 12, elevation: 2 },
   toggleLabel: { fontSize: 16, fontWeight: '600', color: colors.text },
   toggleDescription: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
-  saveButton: { backgroundColor: colors.primary, borderRadius: 12, padding: 16, alignItems: 'center', elevation: 2 },
-  saveButtonText: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
+  saveButton: { backgroundColor: 'transparent', borderRadius: 12, padding: 16, alignItems: 'center', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 6 },
+  saveButtonText: { fontSize: 16, fontWeight: '700', color: '#1A1000' },
 });

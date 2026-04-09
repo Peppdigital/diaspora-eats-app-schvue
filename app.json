@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/images/diaspora_eats_logo.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/diaspora_eats_logo.png",
       "resizeMode": "contain",
@@ -24,7 +23,6 @@
         "foregroundImage": "./assets/images/diaspora_eats_logo.png",
         "backgroundColor": "#000000"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.ooosumfoods.jambalayajerkjollof"
     },
     "web": {

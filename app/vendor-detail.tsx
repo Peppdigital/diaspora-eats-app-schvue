@@ -15,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronLeft, Star, MapPin, Truck, UtensilsCrossed } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { apiGet } from '@/utils/api';
+import { GradientFill } from '@/components/GradientFill';
 
 const GOLD = '#C9A84C';
 const BG = '#0D0D0D';
@@ -171,8 +172,9 @@ export default function VendorDetailScreen() {
             </Text>
             <TouchableOpacity
               onPress={() => { console.log('[VendorDetail] Retry pressed'); fetchVendor(); }}
-              style={{ backgroundColor: GOLD, paddingHorizontal: 28, paddingVertical: 12, borderRadius: 10 }}
+              style={{ backgroundColor: 'transparent', paddingHorizontal: 28, paddingVertical: 12, borderRadius: 10, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 }}
             >
+              <GradientFill borderRadius={10} />
               <Text style={{ color: BG, fontFamily: 'Poppins-SemiBold', fontSize: 14 }}>Retry</Text>
             </TouchableOpacity>
           </View>

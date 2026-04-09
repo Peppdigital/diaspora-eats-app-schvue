@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Platform, Activit
 import { useRouter } from 'expo-router';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { colors } from '@/styles/commonStyles';
+import { GradientFill } from '@/components/GradientFill';
 import { IconSymbol } from '@/components/IconSymbol';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/utils/api';
@@ -103,7 +104,8 @@ export default function OrdersScreen() {
         <View style={styles.emptyState}>
           <IconSymbol ios_icon_name="bag" android_material_icon_name="shopping-bag" size={64} color={textSecondaryColor} />
           <Text style={[styles.emptyTitle, { color: textColor }]}>Sign In to View Orders</Text>
-          <TouchableOpacity style={[styles.signInButton, { backgroundColor: colors.primary }]} onPress={() => router.push('/auth/customer-auth')}>
+          <TouchableOpacity style={styles.signInButton} onPress={() => router.push('/auth/customer-auth')}>
+            <GradientFill borderRadius={12} />
             <Text style={styles.signInButtonText}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -123,13 +125,14 @@ export default function OrdersScreen() {
           {(['all', 'active', 'past'] as const).map((f) => (
             <TouchableOpacity
               key={f}
-              style={[styles.filterTab, filter === f && { backgroundColor: colors.primary }]}
+              style={[styles.filterTab, filter === f && styles.filterTabActive]}
               onPress={() => {
                 console.log('[Orders iOS] Filter changed:', f);
                 setFilter(f);
               }}
             >
-              <Text style={[styles.filterText, { color: filter === f ? '#FFFFFF' : textSecondaryColor }]}>
+              {filter === f && <GradientFill borderRadius={20} />}
+              <Text style={[styles.filterText, { color: filter === f ? '#1A1000' : textSecondaryColor }]}>
                 {f.charAt(0).toUpperCase() + f.slice(1)}
               </Text>
             </TouchableOpacity>
@@ -141,7 +144,8 @@ export default function OrdersScreen() {
         {error !== '' && !loading && (
           <View style={styles.emptyState}>
             <Text style={[styles.emptyText, { color: textSecondaryColor }]}>{error}</Text>
-            <TouchableOpacity onPress={fetchOrders} style={[styles.signInButton, { backgroundColor: colors.primary }]}>
+            <TouchableOpacity onPress={fetchOrders} style={styles.signInButton}>
+              <GradientFill borderRadius={12} />
               <Text style={styles.signInButtonText}>Retry</Text>
             </TouchableOpacity>
           </View>
@@ -230,6 +234,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 15, fontWeight: '500' },
   filterContainer: { flexDirection: 'row', gap: 12, marginBottom: 20 },
   filterTab: { flex: 1, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 20, backgroundColor: colors.highlight, alignItems: 'center' },
+  filterTabActive: { backgroundColor: 'transparent', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.55, shadowRadius: 6, elevation: 6 },
   filterText: { fontSize: 14, fontWeight: '600' },
   loadingContainer: { paddingVertical: 60, alignItems: 'center' },
   ordersList: { gap: 12 },
@@ -248,7 +253,7 @@ const styles = StyleSheet.create({
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 80 },
   emptyTitle: { fontSize: 24, fontWeight: '700', marginTop: 16, marginBottom: 8 },
   emptyText: { fontSize: 15, textAlign: 'center', marginBottom: 16 },
-  signInButton: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  signInButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  signInButton: { backgroundColor: 'transparent', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
+  signInButtonText: { color: '#1A1000', fontSize: 16, fontWeight: '600' },
   bottomPadding: { height: 120 },
 });

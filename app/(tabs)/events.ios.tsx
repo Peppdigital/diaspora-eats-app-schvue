@@ -14,6 +14,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { colors } from '@/styles/commonStyles';
+import { GradientFill } from '@/components/GradientFill';
 import { IconSymbol } from '@/components/IconSymbol';
 import { api } from '@/utils/api';
 
@@ -224,7 +225,8 @@ export default function EventsScreen() {
         {error !== '' && !loading && (
           <View style={styles.emptyState}>
             <Text style={[styles.emptyText, { color: textSecondaryColor }]}>{error}</Text>
-            <TouchableOpacity onPress={fetchEvents} style={[styles.retryButton, { backgroundColor: colors.primary }]}>
+            <TouchableOpacity onPress={fetchEvents} style={styles.retryButton}>
+              <GradientFill borderRadius={12} />
               <Text style={styles.retryText}>Retry</Text>
             </TouchableOpacity>
           </View>
@@ -281,8 +283,9 @@ export default function EventsScreen() {
                       setDateFilter(filter);
                     }}
                   >
-                    <Text style={[styles.filterGridItemText, { color: dateFilter === filter ? '#FFFFFF' : textColor }]}>{filter}</Text>
-                    {dateFilter === filter && <IconSymbol ios_icon_name="checkmark" android_material_icon_name="check" size={16} color="#FFFFFF" />}
+                    {dateFilter === filter && <GradientFill borderRadius={12} />}
+                    <Text style={[styles.filterGridItemText, { color: dateFilter === filter ? '#1A1000' : textColor }]}>{filter}</Text>
+                    {dateFilter === filter && <IconSymbol ios_icon_name="checkmark" android_material_icon_name="check" size={16} color="#1A1000" />}
                   </TouchableOpacity>
                 ))}
               </View>
@@ -334,8 +337,8 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   emptyText: { fontSize: 16, fontWeight: '500', marginTop: 12, textAlign: 'center' },
   emptySubtext: { fontSize: 14, marginTop: 4 },
-  retryButton: { marginTop: 16, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12 },
-  retryText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
+  retryButton: { marginTop: 16, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12, backgroundColor: 'transparent', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
+  retryText: { color: '#1A1000', fontWeight: '700', fontSize: 14 },
   bottomPadding: { height: 40 },
   modalContainer: { flex: 1 },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16, paddingTop: 60, borderBottomWidth: 1, borderBottomColor: colors.highlight },
@@ -347,6 +350,6 @@ const styles = StyleSheet.create({
   filterSectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 12 },
   filterGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   filterGridItem: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, borderWidth: 1, borderColor: colors.highlight },
-  filterGridItemSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  filterGridItemSelected: { backgroundColor: 'transparent', borderColor: '#9C7C1A', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 4 },
   filterGridItemText: { fontSize: 14, fontWeight: '600' },
 });

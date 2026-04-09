@@ -14,6 +14,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
+import { GradientFill } from '@/components/GradientFill';
 import { api } from '@/utils/api';
 import { US_STATES, MAJOR_CITIES_BY_STATE } from '@/constants/LocationData';
 import * as Haptics from 'expo-haptics';
@@ -208,6 +209,7 @@ export default function AdminCreateEventScreen() {
             <View style={styles.chipGrid}>
               {EVENT_TYPES.map((type) => (
                 <TouchableOpacity key={type} style={[styles.chip, eventType === type && styles.chipActive]} onPress={() => setEventType(type)}>
+                  {eventType === type && <GradientFill borderRadius={20} />}
                   <Text style={[styles.chipText, eventType === type && styles.chipTextActive]}>{type}</Text>
                 </TouchableOpacity>
               ))}
@@ -219,6 +221,7 @@ export default function AdminCreateEventScreen() {
             <View style={styles.chipGrid}>
               {DIASPORA_SEGMENTS.map((segment) => (
                 <TouchableOpacity key={segment} style={[styles.chip, diasporaFocus.includes(segment) && styles.chipActive]} onPress={() => toggleDiasporaFocus(segment)}>
+                  {diasporaFocus.includes(segment) && <GradientFill borderRadius={20} />}
                   <Text style={[styles.chipText, diasporaFocus.includes(segment) && styles.chipTextActive]}>{segment}</Text>
                 </TouchableOpacity>
               ))}
@@ -230,6 +233,7 @@ export default function AdminCreateEventScreen() {
             <View style={styles.chipGrid}>
               {CUISINES.map((cuisine) => (
                 <TouchableOpacity key={cuisine} style={[styles.chip, cuisinesHighlighted.includes(cuisine) && styles.chipActive]} onPress={() => toggleCuisine(cuisine)}>
+                  {cuisinesHighlighted.includes(cuisine) && <GradientFill borderRadius={20} />}
                   <Text style={[styles.chipText, cuisinesHighlighted.includes(cuisine) && styles.chipTextActive]}>{cuisine}</Text>
                 </TouchableOpacity>
               ))}
@@ -248,6 +252,7 @@ export default function AdminCreateEventScreen() {
                       style={[styles.pickerChip, state === s.code && styles.pickerChipActive]}
                       onPress={() => { setState(s.code); setCity(''); }}
                     >
+                      {state === s.code && <GradientFill borderRadius={12} />}
                       <Text style={[styles.pickerChipText, state === s.code && styles.pickerChipTextActive]}>{s.code}</Text>
                     </TouchableOpacity>
                   ))}
@@ -261,6 +266,7 @@ export default function AdminCreateEventScreen() {
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pickerScroll}>
                     {citiesForState.map((c) => (
                       <TouchableOpacity key={c} style={[styles.pickerChip, city === c && styles.pickerChipActive]} onPress={() => setCity(c)}>
+                        {city === c && <GradientFill borderRadius={12} />}
                         <Text style={[styles.pickerChipText, city === c && styles.pickerChipTextActive]}>{c}</Text>
                       </TouchableOpacity>
                     ))}
@@ -307,6 +313,7 @@ export default function AdminCreateEventScreen() {
           </View>
 
           <TouchableOpacity style={[styles.saveButton, loading && { opacity: 0.6 }]} onPress={handleSave} disabled={loading}>
+            {!loading && <GradientFill borderRadius={12} />}
             <Text style={styles.saveButtonText}>{loading ? 'Saving...' : isEditing ? 'Update Event' : 'Create Event'}</Text>
           </TouchableOpacity>
 
@@ -336,20 +343,20 @@ const styles = StyleSheet.create({
   textArea: { height: 120, textAlignVertical: 'top' },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.highlight },
-  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipActive: { backgroundColor: 'transparent', borderColor: '#9C7C1A', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
   chipText: { fontSize: 14, fontWeight: '600', color: colors.text },
-  chipTextActive: { color: '#FFFFFF' },
+  chipTextActive: { color: '#1A1000' },
   pickerContainer: { backgroundColor: colors.card, borderRadius: 8, borderWidth: 1, borderColor: colors.highlight },
   pickerScroll: { padding: 8, gap: 8 },
   pickerChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, backgroundColor: colors.highlight },
-  pickerChipActive: { backgroundColor: colors.primary },
+  pickerChipActive: { backgroundColor: 'transparent', borderColor: '#9C7C1A', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
   pickerChipText: { fontSize: 13, fontWeight: '600', color: colors.text },
-  pickerChipTextActive: { color: '#FFFFFF' },
+  pickerChipTextActive: { color: '#1A1000' },
   toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.highlight },
   toggleLabel: { fontSize: 16, fontWeight: '600', color: colors.text },
   toggle: { width: 50, height: 30, borderRadius: 15, backgroundColor: colors.highlight, justifyContent: 'center', padding: 2 },
   toggleThumb: { width: 26, height: 26, borderRadius: 13, backgroundColor: '#FFFFFF' },
   toggleThumbActive: { alignSelf: 'flex-end' },
-  saveButton: { backgroundColor: colors.primary, borderRadius: 12, padding: 16, alignItems: 'center', elevation: 2 },
-  saveButtonText: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
+  saveButton: { backgroundColor: 'transparent', borderRadius: 12, padding: 16, alignItems: 'center', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 6 },
+  saveButtonText: { fontSize: 16, fontWeight: '700', color: '#1A1000' },
 });

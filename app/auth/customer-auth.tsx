@@ -15,7 +15,10 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
+import { GradientFill } from '@/components/GradientFill';
 import { supabase } from '@/app/integrations/supabase/client';
+import { LinearGradient } from 'expo-linear-gradient';
+import { AppleIcon, GoogleIcon } from '@/components/SocialIcons';
 
 export default function CustomerAuthScreen() {
   const router = useRouter();
@@ -176,38 +179,82 @@ export default function CustomerAuthScreen() {
             </View>
           )}
 
-          {/* Apple Sign In — must appear first */}
+          {/* Apple Sign In */}
           <TouchableOpacity
-            style={[styles.appleButton, isAnyLoading && styles.buttonDisabled]}
+            style={[styles.appleButtonOuter, isAnyLoading && styles.buttonDisabled]}
             onPress={handleAppleSignIn}
             disabled={isAnyLoading}
-            activeOpacity={0.85}
+            activeOpacity={0.88}
           >
-            {oauthLoading === 'apple' ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
-            ) : (
-              <>
-                <Text style={styles.appleIcon}></Text>
-                <Text style={styles.appleButtonText}>Continue with Apple</Text>
-              </>
-            )}
+            <LinearGradient
+              colors={['#1C1C1E', '#0A0A0A']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.appleButton}
+            >
+              {/* Subtle top sheen */}
+              <LinearGradient
+                colors={['rgba(255,255,255,0.07)', 'rgba(255,255,255,0)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={styles.socialSheen}
+                pointerEvents="none"
+              />
+              {oauthLoading === 'apple' ? (
+                <ActivityIndicator color="rgba(255,255,255,0.7)" size="small" />
+              ) : (
+                <>
+          
+          <View style={styles.socialIconWrap}>
+            <AppleIcon />
+          </View>
+          
+          
+                  <Text style={styles.appleButtonText}>Continue with Apple</Text>
+                  <View style={styles.socialButtonChevron}>
+                    <Text style={styles.socialChevronText}>›</Text>
+                  </View>
+                </>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
-
+          
           {/* Google Sign In */}
           <TouchableOpacity
-            style={[styles.googleButton, isAnyLoading && styles.buttonDisabled]}
+            style={[styles.googleButtonOuter, isAnyLoading && styles.buttonDisabled]}
             onPress={handleGoogleSignIn}
             disabled={isAnyLoading}
-            activeOpacity={0.85}
+            activeOpacity={0.88}
           >
-            {oauthLoading === 'google' ? (
-              <ActivityIndicator color="#1a1a1a" size="small" />
-            ) : (
-              <>
-                <Text style={styles.googleIcon}>G</Text>
-                <Text style={styles.googleButtonText}>Continue with Google</Text>
-              </>
-            )}
+            <LinearGradient
+              colors={['#FFFFFF', '#F5F5F7']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.googleButton}
+            >
+              {/* Subtle top sheen */}
+              <LinearGradient
+                colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={styles.socialSheen}
+                pointerEvents="none"
+              />
+              {oauthLoading === 'google' ? (
+                <ActivityIndicator color="#4285F4" size="small" />
+              ) : (
+                <>
+          {/* Google button — replace googleLogoWrap + googleLogoText with: */}
+          <View style={styles.socialIconWrap}>
+            <GoogleIcon />
+          </View>
+                  <Text style={styles.googleButtonText}>Continue with Google</Text>
+                  <View style={styles.socialButtonChevron}>
+                    <Text style={[styles.socialChevronText, { color: 'rgba(0,0,0,0.2)' }]}>›</Text>
+                  </View>
+                </>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
 
           {/* Divider */}
@@ -279,8 +326,9 @@ export default function CustomerAuthScreen() {
             disabled={isAnyLoading}
             activeOpacity={0.8}
           >
+            <GradientFill borderRadius={12} />
             {loading ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
+              <ActivityIndicator color="#1A1000" size="small" />
             ) : (
               <Text style={styles.submitButtonText}>{submitLabel}</Text>
             )}
@@ -356,48 +404,92 @@ const styles = StyleSheet.create({
     color: '#FF3B30',
     fontWeight: '500',
   },
-  appleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    backgroundColor: '#000000',
-    borderRadius: 12,
-    padding: 16,
-    minHeight: 54,
-  },
-  appleIcon: {
-    fontSize: 20,
-    color: '#FFFFFF',
-    lineHeight: 24,
-  },
-  appleButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  googleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    minHeight: 54,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.12)',
-  },
-  googleIcon: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#4285F4',
-  },
-  googleButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
-  },
+  appleButtonOuter: {
+  borderRadius: 14,
+  shadowColor: '#000000',
+  shadowOffset: { width: 0, height: 5 },
+  shadowOpacity: 0.5,
+  shadowRadius: 14,
+  elevation: 9,
+},
+appleButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+  borderRadius: 14,
+  paddingVertical: 15,
+  paddingHorizontal: 20,
+  minHeight: 56,
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.07)',
+  overflow: 'hidden',
+},
+
+googleButtonOuter: {
+  borderRadius: 14,
+  shadowColor: 'rgba(0,0,0,0.15)',
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 1,
+  shadowRadius: 10,
+  elevation: 4,
+},
+googleButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+  borderRadius: 14,
+  paddingVertical: 15,
+  paddingHorizontal: 20,
+  minHeight: 56,
+  borderWidth: 1,
+  borderColor: 'rgba(0,0,0,0.08)',
+  overflow: 'hidden',
+},
+
+// Shared sheen overlay — sits on top of the gradient, doesn't block touches
+socialSheen: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  height: '50%',
+  borderTopLeftRadius: 14,
+  borderTopRightRadius: 14,
+},
+
+// Remove appleLogoWrap, appleLogoText, googleLogoWrap, googleLogoText
+// Add this single shared style:
+socialIconWrap: {
+  width: 24,
+  height: 24,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+appleButtonText: {
+  flex: 1,
+  fontSize: 15.5,
+  fontWeight: '600',
+  color: '#FFFFFF',
+  letterSpacing: 0.1,
+},
+
+googleButtonText: {
+  flex: 1,
+  fontSize: 15.5,
+  fontWeight: '600',
+  color: '#1F1F1F',
+  letterSpacing: 0.1,
+},
+socialButtonChevron: {
+  width: 20,
+  alignItems: 'flex-end',
+},
+socialChevronText: {
+  fontSize: 20,
+  fontWeight: '300',
+  color: 'rgba(255,255,255,0.3)',
+  lineHeight: 22,
+},
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -432,13 +524,18 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   submitButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: 'transparent',
     borderRadius: 12,
     padding: 18,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 56,
     marginTop: 4,
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 6,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -446,7 +543,7 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
   toggleContainer: {
     flexDirection: 'row',

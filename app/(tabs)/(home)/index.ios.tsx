@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { useAuth } from '@/contexts/AuthContext';
 import { colors } from '@/styles/commonStyles';
+import { GradientFill } from '@/components/GradientFill';
 import { IconSymbol } from '@/components/IconSymbol';
 import { api } from '@/utils/api';
 
@@ -190,7 +191,8 @@ export default function HomeScreen() {
         {error !== '' && !loading && (
           <View style={styles.errorContainer}>
             <Text style={[styles.errorText, { color: textSecondaryColor }]}>{error}</Text>
-            <TouchableOpacity onPress={fetchData} style={[styles.retryButton, { backgroundColor: colors.primary }]}>
+            <TouchableOpacity onPress={fetchData} style={styles.retryButton}>
+              <GradientFill borderRadius={12} />
               <Text style={styles.retryText}>Retry</Text>
             </TouchableOpacity>
           </View>
@@ -249,8 +251,8 @@ const styles = StyleSheet.create({
   loadingContainer: { paddingVertical: 60, alignItems: 'center' },
   errorContainer: { paddingHorizontal: 20, paddingVertical: 40, alignItems: 'center' },
   errorText: { fontSize: 15, textAlign: 'center', marginBottom: 16 },
-  retryButton: { paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12 },
-  retryText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
+  retryButton: { backgroundColor: 'transparent', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
+  retryText: { color: '#1A1000', fontWeight: '700', fontSize: 14 },
   section: { marginBottom: 32 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 16 },
   sectionTitle: { fontSize: 20, fontWeight: '700' },

@@ -3,7 +3,7 @@ import { expoClient } from "@better-auth/expo/client";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
-export const API_URL = "https://vitgqdlredogyfuodnfy.supabase.co";
+export const API_URL = process.env.EXPO_PUBLIC_SUPABASE_URL
 export const BEARER_TOKEN_KEY = "diasporaeats_bearer_token";
 
 const storage = Platform.OS === "web"
@@ -30,7 +30,9 @@ export async function getBearerToken(): Promise<string | null> {
   if (Platform.OS === "web") {
     return localStorage.getItem(BEARER_TOKEN_KEY);
   }
-  return SecureStore.getItemAsync(BEARER_TOKEN_KEY);
+  const token = await SecureStore.getItemAsync(BEARER_TOKEN_KEY);
+  console.log('[auth] getBearerToken result:', token ? `${token.slice(0, 8)}...` : 'NULL');
+  return token;
 }
 
 export async function setBearerToken(token: string) {

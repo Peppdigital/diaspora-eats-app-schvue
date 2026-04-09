@@ -15,6 +15,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
 import { api } from '@/utils/api';
+import { GradientFill } from '@/components/GradientFill';
 import * as Haptics from 'expo-haptics';
 
 type ApiVendor = {
@@ -127,20 +128,24 @@ export default function AdminVendorsScreen() {
             <Text style={styles.filtersTitle}>Filters</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={styles.filterChips}>
-                {(['all', 'pending', 'active'] as const).map((f) => (
-                  <TouchableOpacity
-                    key={f}
-                    style={[styles.filterChip, filterStatus === f && styles.filterChipActive]}
-                    onPress={() => {
-                      console.log('[AdminVendors] Filter changed:', f);
-                      setFilterStatus(f);
-                    }}
-                  >
-                    <Text style={[styles.filterChipText, filterStatus === f && styles.filterChipTextActive]}>
-                      {f === 'all' ? 'All Status' : f.charAt(0).toUpperCase() + f.slice(1)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                {(['all', 'pending', 'active'] as const).map((f) => {
+                  const isActive = filterStatus === f;
+                  return (
+                    <TouchableOpacity
+                      key={f}
+                      style={[styles.filterChip, isActive && styles.filterChipActive]}
+                      onPress={() => {
+                        console.log('[AdminVendors] Filter changed:', f);
+                        setFilterStatus(f);
+                      }}
+                    >
+                      {isActive && <GradientFill borderRadius={20} />}
+                      <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
+                        {f === 'all' ? 'All Status' : f.charAt(0).toUpperCase() + f.slice(1)}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </ScrollView>
           </View>
@@ -151,6 +156,7 @@ export default function AdminVendorsScreen() {
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity style={styles.retryButton} onPress={fetchVendors}>
+                <GradientFill borderRadius={12} />
                 <Text style={styles.retryButtonText}>Retry</Text>
               </TouchableOpacity>
             </View>
@@ -228,14 +234,14 @@ const styles = StyleSheet.create({
   filtersTitle: { fontSize: 14, fontWeight: '600', color: colors.textSecondary, marginBottom: 12 },
   filterChips: { flexDirection: 'row', gap: 8 },
   filterChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.highlight },
-  filterChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  filterChipActive: { backgroundColor: 'transparent', borderColor: '#9C7C1A', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
   filterChipText: { fontSize: 14, fontWeight: '600', color: colors.text },
-  filterChipTextActive: { color: '#FFFFFF' },
+  filterChipTextActive: { color: '#1A1000' },
   loadingContainer: { paddingVertical: 60, alignItems: 'center' },
   errorContainer: { paddingVertical: 40, alignItems: 'center' },
   errorText: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', marginBottom: 16 },
-  retryButton: { backgroundColor: colors.primary, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12 },
-  retryButtonText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
+  retryButton: { backgroundColor: 'transparent', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
+  retryButtonText: { color: '#1A1000', fontWeight: '700', fontSize: 14 },
   vendorsList: { gap: 16 },
   resultsCount: { fontSize: 14, fontWeight: '600', color: colors.textSecondary, marginBottom: 8 },
   vendorCard: { backgroundColor: colors.card, borderRadius: 12, padding: 16, elevation: 2 },

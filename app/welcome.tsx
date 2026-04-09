@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { GradientFill } from '@/components/GradientFill';
 import { colors, typography, textStyles } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
 
@@ -55,12 +56,8 @@ export default function WelcomeScreen() {
             onPress={() => router.push('/auth/customer-auth')}
             activeOpacity={0.9}
           >
-            <LinearGradient
-              colors={[colors.gold, '#B8941F']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.buttonGradient}
-            >
+            <GradientFill borderRadius={16} />
+            <View style={styles.buttonGradient}>
               <IconSymbol
                 ios_icon_name="fork.knife.circle.fill"
                 android_material_icon_name="restaurant-menu"
@@ -74,7 +71,7 @@ export default function WelcomeScreen() {
                 size={24}
                 color="#0D0D0D"
               />
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -190,8 +187,10 @@ const styles = StyleSheet.create({
   },
   roleButton: {
     borderRadius: 16,
-    overflow: 'hidden',
-    boxShadow: '0px 8px 24px rgba(212, 175, 55, 0.3)',
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.55,
+    shadowRadius: 10,
     elevation: 8,
   },
   buttonGradient: {
