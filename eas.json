@@ -3,6 +3,7 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "prebuildCommand": "expo prebuild --clean",
       "autoIncrement": true
     },
     "preview": {
@@ -12,5 +13,8 @@
     "production": {
       "autoIncrement": true
     }
+  },
+  "cli": {
+    "appVersionSource": "remote"
   }
 }

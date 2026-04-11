@@ -14,6 +14,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ooosumfoods.jambalayajerkjollof",
+      "backgroundColor": "#0D0D0D",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -41,7 +42,10 @@
     },
     "extra": {
       "router": {},
-      "backendUrl": "https://vitgqdlredogyfuodnfy.supabase.co/functions/v1"
+      "backendUrl": "https://vitgqdlredogyfuodnfy.supabase.co/functions/v1",
+      "eas": {
+        "projectId": "11e0cbaf-c71d-4626-9a4f-2fb537e493d9"
+      }
     }
   },
   "scheme": "jambalayajerkjollof"

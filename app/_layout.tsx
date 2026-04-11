@@ -3,8 +3,11 @@ import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import * as SystemUI from 'expo-system-ui';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { CartProvider } from '@/contexts/CartContext';
+
+SystemUI.setBackgroundColorAsync('#0D0D0D');
 import {
   Montserrat_800ExtraBold,
   Montserrat_600SemiBold,
@@ -52,6 +55,7 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
+            contentStyle: { backgroundColor: '#0D0D0D' },
           }}
         >
           <Stack.Screen name="index" />
