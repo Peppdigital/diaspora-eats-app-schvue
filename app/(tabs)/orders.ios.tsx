@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { colors } from '@/styles/commonStyles';
@@ -20,6 +21,7 @@ type ApiOrder = {
   total_amount?: number;
   created_at?: string;
   placed_at?: string;
+  item_count?: number;
   order_type?: 'pickup' | 'delivery';
 };
 
@@ -122,21 +124,39 @@ export default function OrdersScreen() {
         </View>
 
         <View style={styles.filterContainer}>
-          {(['all', 'active', 'past'] as const).map((f) => (
-            <TouchableOpacity
-              key={f}
-              style={[styles.filterTab, filter === f && styles.filterTabActive]}
-              onPress={() => {
-                console.log('[Orders iOS] Filter changed:', f);
-                setFilter(f);
-              }}
-            >
-              {filter === f && <GradientFill borderRadius={20} />}
-              <Text style={[styles.filterText, { color: filter === f ? '#1A1000' : textSecondaryColor }]}>
-                {f.charAt(0).toUpperCase() + f.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {(['all', 'active', 'past'] as const).map((f) => {
+            const isActive = filter === f;
+            return (
+              <TouchableOpacity
+                key={f}
+                style={[styles.filterTab, isActive && styles.filterTabActive]}
+                onPress={() => {
+                  console.log('[Orders iOS] Filter changed:', f);
+                  setFilter(f);
+                }}
+              >
+                {isActive && (
+                  <>
+                    <LinearGradient
+                      colors={['#F5D67A', '#D4AF37', '#9C7C1A']}
+                      start={{ x: 0.2, y: 0 }}
+                      end={{ x: 0.8, y: 1 }}
+                      style={[StyleSheet.absoluteFillObject, { borderRadius: 20 }]}
+                    />
+                    <LinearGradient
+                      colors={['rgba(255,255,255,0.22)', 'rgba(255,255,255,0)']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 0, y: 0.6 }}
+                      style={[StyleSheet.absoluteFillObject, { borderRadius: 20 }]}
+                    />
+                  </>
+                )}
+                <Text style={[styles.filterText, { color: isActive ? '#1A1000' : textSecondaryColor }]}>
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {loading && <View style={styles.loadingContainer}><ActivityIndicator size="large" color={colors.primary} /></View>}

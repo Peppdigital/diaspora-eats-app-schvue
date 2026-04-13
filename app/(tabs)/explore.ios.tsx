@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Stack } from "expo-router";
 import {
   ScrollView, StyleSheet, View, Text,
   TouchableOpacity, TextInput,
@@ -33,132 +32,126 @@ export default function ExploreScreen() {
   ];
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: "Explore",
-          headerLargeTitle: true,
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.text,
-        }}
-      />
-      <View style={styles.container}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          contentInsetAdjustmentBehavior="automatic"
-        >
-          {/* Search */}
-          <View style={styles.searchWrap}>
-            <IconSymbol
-              ios_icon_name="magnifyingglass"
-              android_material_icon_name="search"
-              size={17}
-              color={colors.textSecondary}
-            />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Cuisine, city, or restaurant…"
-              placeholderTextColor={colors.textSecondary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.7}>
-                <IconSymbol
-                  ios_icon_name="xmark.circle.fill"
-                  android_material_icon_name="cancel"
-                  size={17}
-                  color={colors.textSecondary}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.eyebrow}>DIASPORA EATS</Text>
+          <Text style={styles.title}>Explore</Text>
+          <Text style={styles.subtitle}>Discover Black Diaspora cuisine near you</Text>
+        </View>
 
-          {/* Community */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Browse by Community</Text>
-              <View style={styles.sectionPill}>
-                <Text style={styles.sectionPillText}>{diasporaCategories.length}</Text>
-              </View>
-            </View>
+        {/* Search */}
+        <View style={styles.searchWrap}>
+          <IconSymbol
+            ios_icon_name="magnifyingglass"
+            android_material_icon_name="search"
+            size={17}
+            color={colors.textSecondary}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Cuisine, city, or restaurant…"
+            placeholderTextColor={colors.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.7}>
+              <IconSymbol
+                ios_icon_name="xmark.circle.fill"
+                android_material_icon_name="cancel"
+                size={17}
+                color={colors.textSecondary}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
 
-            <View style={styles.categoryGrid}>
-              {diasporaCategories.map((cat, i) => {
-                const isActive = activeCategory === cat.name;
-                return (
-                  <TouchableOpacity
-                    key={i}
-                    style={styles.categoryCardOuter}
-                    onPress={() => setActiveCategory(isActive ? null : cat.name)}
-                    activeOpacity={0.85}
-                  >
-                    <LinearGradient
-                      colors={
-                        isActive
-                          ? [cat.accent + '30', cat.accent + '10']
-                          : ['#1E1E20', '#161618']
-                      }
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={[
-                        styles.categoryCard,
-                        isActive && { borderColor: cat.accent + '60' },
-                      ]}
-                    >
-                      {/* Top accent bar */}
-                      <View style={[styles.categoryAccentBar, { backgroundColor: cat.accent }]} />
-
-                      <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
-                      <Text style={styles.categoryName}>{cat.name}</Text>
-                      <Text style={styles.categorySub}>{cat.sub}</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                );
-              })}
+        {/* Community */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Browse by Community</Text>
+            <View style={styles.sectionPill}>
+              <Text style={styles.sectionPillText}>{diasporaCategories.length}</Text>
             </View>
           </View>
 
-          {/* Cuisine */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Browse by Cuisine</Text>
-              <View style={styles.sectionPill}>
-                <Text style={styles.sectionPillText}>{cuisineTypes.length}</Text>
-              </View>
-            </View>
-
-            <View style={styles.cuisineList}>
-              {cuisineTypes.map((cuisine, i) => (
+          <View style={styles.categoryGrid}>
+            {diasporaCategories.map((cat, i) => {
+              const isActive = activeCategory === cat.name;
+              return (
                 <TouchableOpacity
                   key={i}
-                  style={styles.cuisineItem}
-                  activeOpacity={0.75}
+                  style={styles.categoryCardOuter}
+                  onPress={() => setActiveCategory(isActive ? null : cat.name)}
+                  activeOpacity={0.85}
                 >
-                  <View style={styles.cuisineLeft}>
-                    <View style={styles.cuisineEmojiWrap}>
-                      <Text style={styles.cuisineEmoji}>{cuisine.emoji}</Text>
-                    </View>
-                    <Text style={styles.cuisineText}>{cuisine.name}</Text>
-                  </View>
-                  <View style={styles.cuisineChevronWrap}>
-                    <IconSymbol
-                      ios_icon_name="chevron.right"
-                      android_material_icon_name="chevron-right"
-                      size={14}
-                      color={colors.textSecondary}
-                    />
-                  </View>
+                  <LinearGradient
+                    colors={
+                      isActive
+                        ? [cat.accent + '30', cat.accent + '10']
+                        : ['#1E1E20', '#161618']
+                    }
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={[
+                      styles.categoryCard,
+                      isActive && { borderColor: cat.accent + '60' },
+                    ]}
+                  >
+                    <View style={[styles.categoryAccentBar, { backgroundColor: cat.accent }]} />
+                    <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
+                    <Text style={styles.categoryName}>{cat.name}</Text>
+                    <Text style={styles.categorySub}>{cat.sub}</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
-              ))}
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Cuisine */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Browse by Cuisine</Text>
+            <View style={styles.sectionPill}>
+              <Text style={styles.sectionPillText}>{cuisineTypes.length}</Text>
             </View>
           </View>
 
-          <View style={{ height: 40 }} />
-        </ScrollView>
-      </View>
-    </>
+          <View style={styles.cuisineList}>
+            {cuisineTypes.map((cuisine, i) => (
+              <TouchableOpacity
+                key={i}
+                style={styles.cuisineItem}
+                activeOpacity={0.75}
+              >
+                <View style={styles.cuisineLeft}>
+                  <View style={styles.cuisineEmojiWrap}>
+                    <Text style={styles.cuisineEmoji}>{cuisine.emoji}</Text>
+                  </View>
+                  <Text style={styles.cuisineText}>{cuisine.name}</Text>
+                </View>
+                <View style={styles.cuisineChevronWrap}>
+                  <IconSymbol
+                    ios_icon_name="chevron.right"
+                    android_material_icon_name="chevron-right"
+                    size={14}
+                    color={colors.textSecondary}
+                  />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={{ height: 120 }} />
+      </ScrollView>
+    </View>
   );
 }
 
@@ -168,8 +161,33 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   scrollContent: {
+    paddingTop: 64,
     paddingHorizontal: 20,
-    paddingTop: 12,
+  },
+
+  // ── Header ───────────────────────────────────────────────────────
+  header: {
+    marginBottom: 28,
+  },
+  eyebrow: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#C9A84C',
+    letterSpacing: 2.5,
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 38,
+    fontWeight: '800',
+    color: colors.text,
+    letterSpacing: -1,
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.textSecondary,
+    letterSpacing: 0.1,
   },
 
   // ── Search ──────────────────────────────────────────────────────
@@ -181,7 +199,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 13,
-    marginBottom: 32,
+    marginBottom: 36,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
   },
@@ -189,7 +207,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: colors.text,
-
   },
 
   // ── Section chrome ───────────────────────────────────────────────
@@ -240,7 +257,6 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     borderRadius: 16,
-    paddingTop: 0,
     paddingBottom: 16,
     paddingHorizontal: 16,
     alignItems: 'flex-start',
@@ -250,12 +266,10 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   categoryAccentBar: {
-    width: '100%',
     height: 3,
-    marginBottom: 14,
-    marginHorizontal: -16,
-    paddingHorizontal: 16,
     alignSelf: 'stretch',
+    marginHorizontal: -16,
+    marginBottom: 14,
     opacity: 0.85,
   },
   categoryEmoji: {
@@ -322,4 +336,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-

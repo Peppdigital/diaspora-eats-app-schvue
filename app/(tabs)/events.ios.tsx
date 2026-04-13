@@ -31,6 +31,7 @@ type ApiEvent = {
   event_type?: string;
   ticket_price?: number;
   is_featured?: boolean;
+  is_published?: boolean;
   diaspora_focus?: string[];
 };
 
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
   emptySubtext: { fontSize: 14, marginTop: 4 },
   retryButton: { marginTop: 16, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12, backgroundColor: 'transparent', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
   retryText: { color: '#1A1000', fontWeight: '700', fontSize: 14 },
-  bottomPadding: { height: 40 },
+  bottomPadding: { height: 120 },
   modalContainer: { flex: 1 },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16, paddingTop: 60, borderBottomWidth: 1, borderBottomColor: colors.highlight },
   modalCancel: { fontSize: 16, fontWeight: '600' },
@@ -350,6 +351,6 @@ const styles = StyleSheet.create({
   filterSectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 12 },
   filterGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   filterGridItem: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, borderWidth: 1, borderColor: colors.highlight },
-  filterGridItemSelected: { backgroundColor: 'transparent', borderColor: '#9C7C1A', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 4 },
+  filterGridItemSelected: { backgroundColor: 'transparent', borderColor: '#9C7C1A', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
   filterGridItemText: { fontSize: 14, fontWeight: '600' },
 });
