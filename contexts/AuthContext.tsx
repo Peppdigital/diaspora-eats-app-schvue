@@ -27,6 +27,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   fetchUser: () => Promise<User | null>;
+  updateUser: (updates: Partial<Omit<User, 'id' | 'email'>>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -157,9 +158,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await setBearerToken(token);
       await fetchUser();
     } else {
-      // Native social auth via deep link / OAuth redirect
-      const url = `${API_URL}/functions/v1/auth-social?provider=${provider}&callbackURL=diasporaeats://auth-callback`;
-      await Linking.openURL(url);
+      const WebBrowser = await import("expo-web-browser");
+      const callbackURL = "jambalayajerkjollof://auth-callback";
+      const authURL = `${API_URL}/functions/v1/auth-social?provider=${provider}&callbackURL=${encodeURIComponent(callbackURL)}`;
+      const result = await WebBrowser.openAuthSessionAsync(authURL, callbackURL);
+
+      if (result.type === "success" && result.url) {
+        const queryString = result.url.includes("?") ? result.url.split("?")[1] : "";
+        const token = new URLSearchParams(queryString).get("better_auth_token");
+        if (!token) throw new Error(`${provider} sign in failed: no token received`);
+        await setBearerToken(token);
+        await fetchUser();
+      } else if (result.type === "cancel" || result.type === "dismiss") {
+        throw new Error("Authentication cancelled");
+      } else {
+        throw new Error(`${provider} sign in failed`);
+      }
     }
   };
 
@@ -201,6 +215,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await clearAuthTokens();
   };
 
+  const updateUser = async (updates: Partial<Omit<User, 'id' | 'email'>>) => {
+    const token = await getBearerToken();
+    if (!token) throw new Error("Not authenticated");
+    const res = await fetch(`${API_URL}/functions/v1/api-user-profile`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(updates),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to update profile");
+    if (data.profile) setUser(data.profile);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -213,6 +240,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signInWithGoogle,
         signOut,
         fetchUser,
+        updateUser,
       }}
     >
       {children}

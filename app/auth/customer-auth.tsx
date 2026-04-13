@@ -37,7 +37,7 @@ export default function CustomerAuthScreen() {
   useEffect(() => {
     if (user) {
       console.log('[CustomerAuth] User authenticated, navigating to tabs:', user.email);
-      router.replace('/(tabs)/(home)/');
+      router.replace('/(tabs)/(home)');
     }
   }, [user]);
 

@@ -314,8 +314,8 @@ export default function VendorAuthScreen() {
           offers_delivery: false,
           delivery_partners: [],
           avg_price_level: '$$',
-          rating_average: 0,
-          rating_count: 0,
+          rating: 0,
+          review_count: 0,
         })
         .select('id')
         .single();

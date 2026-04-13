@@ -38,7 +38,7 @@ export default function LocationSetupScreen() {
         default_location_state: selectedState,
         default_location_city: selectedCity,
       });
-      router.replace('/(tabs)/(home)/');
+      router.replace('/(tabs)/(home)');
     } catch (error) {
       console.error('Location setup error:', error);
       Alert.alert('Error', 'Failed to save location. Please try again.');
@@ -48,7 +48,7 @@ export default function LocationSetupScreen() {
   };
 
   const handleSkip = () => {
-    router.replace('/(tabs)/(home)/');
+    router.replace('/(tabs)/(home)');
   };
 
   const cities = selectedState ? MAJOR_CITIES_BY_STATE[selectedState] || [] : [];

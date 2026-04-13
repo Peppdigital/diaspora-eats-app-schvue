@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { Platform } from "react-native";
+import * as WebBrowser from "expo-web-browser";
+
+// Required on Android to signal openAuthSessionAsync that the redirect completed
+WebBrowser.maybeCompleteAuthSession();
 
 type Status = "processing" | "success" | "error";
 
