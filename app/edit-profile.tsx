@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { authenticatedGet, authenticatedPatch } from '@/utils/api';
 import { ChevronLeft, Lock } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { GradientFill } from '@/components/GradientFill';
 import * as Haptics from 'expo-haptics';
 
 function resolveImageSource(source: string | number | ImageSourcePropType | undefined): ImageSourcePropType {
@@ -360,7 +361,7 @@ export default function EditProfileScreen() {
             disabled={saving}
             activeOpacity={0.85}
             style={{
-              backgroundColor: saving ? '#8B7320' : '#D4AF37',
+              backgroundColor: 'transparent',
               borderRadius: 12,
               paddingVertical: 16,
               alignItems: 'center',
@@ -368,8 +369,15 @@ export default function EditProfileScreen() {
               flexDirection: 'row',
               justifyContent: 'center',
               gap: 10,
+              opacity: saving ? 0.6 : 1,
+              shadowColor: '#D4AF37',
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.5,
+              shadowRadius: 8,
+              elevation: 6,
             }}
           >
+            {!saving && <GradientFill borderRadius={12} />}
             {saving && <ActivityIndicator color="#0D0D0D" size="small" />}
             <Text
               style={{

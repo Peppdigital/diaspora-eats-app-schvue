@@ -5,13 +5,14 @@ import { useRouter } from "expo-router";
 import { useTheme } from "@react-navigation/native";
 import { colors } from "@/styles/commonStyles";
 import { IconSymbol } from "@/components/IconSymbol";
+import { GradientFill } from "@/components/GradientFill";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const theme = useTheme();
   const isDark = theme.dark;
-  const { user, isAuthenticated, signOut } = useAuth();
+  const { user, loading, isAuthenticated, signOut } = useAuth();
 
   const bgColor = isDark ? colors.backgroundDark : colors.background;
   const textColor = isDark ? colors.textDark : colors.text;
@@ -22,6 +23,8 @@ export default function ProfileScreen() {
     await signOut();
     router.replace('/welcome');
   };
+
+  if (loading) return null;
 
   if (!isAuthenticated || !user) {
     return (
@@ -50,10 +53,11 @@ export default function ProfileScreen() {
               Create an account or sign in to access your profile and orders
             </Text>
             <TouchableOpacity
-              style={[styles.authButton, { backgroundColor: colors.primary }]}
+              style={styles.authButton}
               onPress={() => router.push('/auth/customer-auth')}
               activeOpacity={0.7}
             >
+              <GradientFill borderRadius={12} />
               <Text style={styles.authButtonText}>Sign In / Sign Up</Text>
             </TouchableOpacity>
           </View>
@@ -79,12 +83,12 @@ export default function ProfileScreen() {
         <View style={[styles.userCard, { backgroundColor: cardColor }]}>
           <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
             <Text style={styles.avatarText}>
-              {user.full_name.charAt(0).toUpperCase()}
+              {(user.name ?? user.email).charAt(0).toUpperCase()}
             </Text>
           </View>
           <View style={styles.userInfo}>
             <Text style={[styles.userName, { color: textColor }]}>
-              {user.full_name}
+              {user.name ?? user.email}
             </Text>
             <Text style={[styles.userEmail, { color: textSecondaryColor }]}>
               {user.email}
@@ -404,9 +408,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 12,
+    backgroundColor: 'transparent',
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 5,
   },
   authButtonText: {
-    color: '#FFFFFF',
+    color: '#1A1000',
     fontSize: 16,
     fontWeight: '700',
   },

@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
+import { GradientFill } from '@/components/GradientFill';
 import { api } from '@/utils/api';
 import * as Haptics from 'expo-haptics';
 
@@ -154,6 +155,7 @@ export default function VendorMenuScreen() {
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity style={styles.retryButton} onPress={fetchMenu}>
+                <GradientFill borderRadius={12} />
                 <Text style={styles.retryButtonText}>Retry</Text>
               </TouchableOpacity>
             </View>
@@ -188,6 +190,7 @@ export default function VendorMenuScreen() {
                         setNewCategoryName('');
                       }}
                     >
+                      <GradientFill borderRadius={8} />
                       <Text style={styles.saveButtonText}>Add</Text>
                     </TouchableOpacity>
                   </View>
@@ -308,8 +311,8 @@ const styles = StyleSheet.create({
   loadingContainer: { paddingVertical: 60, alignItems: 'center' },
   errorContainer: { paddingVertical: 40, alignItems: 'center' },
   errorText: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', marginBottom: 16 },
-  retryButton: { backgroundColor: colors.primary, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12 },
-  retryButtonText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
+  retryButton: { backgroundColor: 'transparent', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
+  retryButtonText: { color: '#1A1000', fontWeight: '700', fontSize: 14 },
   addCategoryButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.card, borderRadius: 12, padding: 16, marginBottom: 16, gap: 8, elevation: 2 },
   addCategoryButtonText: { fontSize: 16, fontWeight: '600', color: colors.primary },
   addCategoryForm: { backgroundColor: colors.card, borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2 },
@@ -318,8 +321,8 @@ const styles = StyleSheet.create({
   formButton: { flex: 1, borderRadius: 8, padding: 12, alignItems: 'center' },
   cancelButton: { backgroundColor: colors.highlight },
   cancelButtonText: { fontSize: 14, fontWeight: '600', color: colors.text },
-  saveButton: { backgroundColor: colors.primary },
-  saveButtonText: { fontSize: 14, fontWeight: '600', color: '#FFFFFF' },
+  saveButton: { backgroundColor: 'transparent', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
+  saveButtonText: { fontSize: 14, fontWeight: '600', color: '#1A1000' },
   categoriesList: { gap: 12 },
   categoryCard: { backgroundColor: colors.card, borderRadius: 12, overflow: 'hidden', elevation: 2 },
   categoryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16 },

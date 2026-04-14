@@ -13,11 +13,14 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors } from '@/styles/commonStyles';
+import { GradientFill } from '@/components/GradientFill';
 import { IconSymbol } from '@/components/IconSymbol';
 import { DiasporaSegment, VendorType } from '@/types/database.types';
 import { US_STATES, MAJOR_CITIES_BY_STATE } from '@/constants/LocationData';
 import { supabase } from '@/app/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { LinearGradient } from 'expo-linear-gradient';
+import { AppleIcon, GoogleIcon } from '@/components/SocialIcons';
 
 type Mode = 'select' | 'signin' | 'claim' | 'request';
 
@@ -106,11 +109,9 @@ export default function VendorAuthScreen() {
     console.log('[VendorAuth] Sign in pressed:', signinEmail);
     setLoading(true);
     try {
-      await signInWithEmail(signinEmail.trim().toLowerCase(), signinPassword);
+      const authedUser = await signInWithEmail(signinEmail.trim().toLowerCase(), signinPassword);
       console.log('[VendorAuth] Sign in success, checking vendor role');
-      // user state will update, but we need the id — fetch profile directly
-      const session = await supabase.auth.getSession();
-      const userId = session.data.session?.user?.id;
+      const userId = authedUser?.id;
       if (userId) {
         await checkVendorRole(userId);
       } else {
@@ -173,13 +174,15 @@ export default function VendorAuthScreen() {
     console.log('[VendorAuth] Claim listing pressed — email:', claimEmail, 'invite code:', inviteCode);
     setLoading(true);
     try {
+      type InviteCode = { id: string; vendor_id: string; is_used: boolean; expires_at: string | null };
+
       // 1. Validate invite code
       const { data: inviteData, error: inviteError } = await supabase
         .from('vendor_invite_codes')
         .select('id, vendor_id, is_used, expires_at')
         .eq('invite_code', inviteCode.trim().toUpperCase())
         .eq('email_sent_to', claimEmail.trim().toLowerCase())
-        .single();
+        .single() as { data: InviteCode | null; error: unknown };
 
       console.log('[VendorAuth] Invite code lookup result:', inviteData, inviteError);
 
@@ -196,15 +199,14 @@ export default function VendorAuthScreen() {
         return;
       }
 
-      // 2. Create Better Auth account
-      console.log('[VendorAuth] Creating Better Auth account for:', claimEmail);
-      await signUpWithEmail(claimEmail.trim().toLowerCase(), claimPassword, 'Vendor');
-      console.log('[VendorAuth] Better Auth sign-up success');
+      // 2. Create account
+      console.log('[VendorAuth] Creating account for:', claimEmail);
+      const authedUser = await signUpWithEmail(claimEmail.trim().toLowerCase(), claimPassword, 'Vendor');
+      console.log('[VendorAuth] Sign-up success');
 
-      // 3. Get the new user id from session
-      const session = await supabase.auth.getSession();
-      const userId = session.data.session?.user?.id;
-      console.log('[VendorAuth] New user id from session:', userId);
+      // 3. Get the new user id from the returned auth user
+      const userId = authedUser?.id;
+      console.log('[VendorAuth] New user id:', userId);
 
       if (!userId) {
         setError('Account creation failed. Please try again.');
@@ -216,13 +218,15 @@ export default function VendorAuthScreen() {
         .from('user_profile')
         .upsert({ user_id: userId, role: 'vendor', full_name: 'Vendor' }, { onConflict: 'user_id' });
       console.log('[VendorAuth] user_profile upsert error:', profileError);
+      if (profileError) throw new Error('Failed to set up vendor profile. Please contact support.');
 
       // 5. Link user to vendor and mark invite used
       const { error: vendorUpdateError } = await supabase
         .from('vendors')
-        .update({ owner_user_id: userId, onboarding_status: 'claimed' })
+        .update({ user_id: userId, onboarding_status: 'claimed' })
         .eq('id', inviteData.vendor_id);
       console.log('[VendorAuth] Vendor claim update error:', vendorUpdateError);
+      if (vendorUpdateError) throw new Error('Failed to link vendor account. Please contact support.');
 
       const { error: inviteMarkError } = await supabase
         .from('vendor_invite_codes')
@@ -258,13 +262,12 @@ export default function VendorAuthScreen() {
     try {
       // 1. Create Better Auth account
       console.log('[VendorAuth] Calling signUpWithEmail for:', requestEmail);
-      await signUpWithEmail(requestEmail.trim().toLowerCase(), requestPassword, businessName.trim());
+      const newUser = await signUpWithEmail(requestEmail.trim().toLowerCase(), requestPassword, businessName.trim());
       console.log('[VendorAuth] Better Auth sign-up success');
 
-      // 2. Get user id from session
-      const session = await supabase.auth.getSession();
-      const userId = session.data.session?.user?.id;
-      console.log('[VendorAuth] New user id from session:', userId);
+      // 2. Get user id from returned user
+      const userId = newUser?.id;
+      console.log('[VendorAuth] New user id:', userId);
 
       if (!userId) {
         setError('Account creation failed. Please try again.');
@@ -289,7 +292,7 @@ export default function VendorAuthScreen() {
       const { data: vendorData, error: vendorInsertError } = await supabase
         .from('vendors')
         .insert({
-          owner_user_id: userId,
+          user_id: userId,
           vendor_type: vendorType,
           name: businessName.trim(),
           tagline: '',
@@ -311,8 +314,8 @@ export default function VendorAuthScreen() {
           offers_delivery: false,
           delivery_partners: [],
           avg_price_level: '$$',
-          rating_average: 0,
-          rating_count: 0,
+          rating: 0,
+          review_count: 0,
         })
         .select('id')
         .single();
@@ -467,7 +470,7 @@ export default function VendorAuthScreen() {
             >
               <IconSymbol
                 ios_icon_name="chevron.left"
-                android_material_icon_name="chevron_left"
+                android_material_icon_name="chevron-left"
                 size={24}
                 color={colors.text}
               />
@@ -491,39 +494,86 @@ export default function VendorAuthScreen() {
               </View>
             )}
 
-            {/* Apple Sign In — must appear first */}
-            <TouchableOpacity
-              style={[styles.appleButton, isAnyLoading && styles.buttonDisabled]}
-              onPress={handleVendorAppleSignIn}
-              disabled={isAnyLoading}
-              activeOpacity={0.85}
-            >
-              {oauthLoading === 'apple' ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <>
-                  <Text style={styles.appleIcon}></Text>
-                  <Text style={styles.appleButtonText}>Continue with Apple</Text>
-                </>
-              )}
-            </TouchableOpacity>
 
-            {/* Google Sign In */}
-            <TouchableOpacity
-              style={[styles.googleButton, isAnyLoading && styles.buttonDisabled]}
-              onPress={handleVendorGoogleSignIn}
-              disabled={isAnyLoading}
-              activeOpacity={0.85}
-            >
-              {oauthLoading === 'google' ? (
-                <ActivityIndicator color="#1a1a1a" size="small" />
-              ) : (
-                <>
-                  <Text style={styles.googleIcon}>G</Text>
-                  <Text style={styles.googleButtonText}>Continue with Google</Text>
-                </>
-              )}
-            </TouchableOpacity>
+
+  {/* Apple Sign In */}
+<TouchableOpacity
+  style={[styles.appleButtonOuter, isAnyLoading && styles.buttonDisabled]}
+  onPress={handleVendorAppleSignIn}
+  disabled={isAnyLoading}
+  activeOpacity={0.88}
+>
+  <LinearGradient
+    colors={['#1C1C1E', '#0A0A0A']}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    style={styles.appleButton}
+  >
+    {/* Subtle top sheen */}
+    <LinearGradient
+      colors={['rgba(255,255,255,0.07)', 'rgba(255,255,255,0)']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={styles.socialSheen}
+      pointerEvents="none"
+    />
+    {oauthLoading === 'apple' ? (
+      <ActivityIndicator color="rgba(255,255,255,0.7)" size="small" />
+    ) : (
+      <>
+
+<View style={styles.socialIconWrap}>
+  <AppleIcon />
+</View>
+
+
+        <Text style={styles.appleButtonText}>Continue with Apple</Text>
+        <View style={styles.socialButtonChevron}>
+          <Text style={styles.socialChevronText}>›</Text>
+        </View>
+      </>
+    )}
+  </LinearGradient>
+</TouchableOpacity>
+
+{/* Google Sign In */}
+<TouchableOpacity
+  style={[styles.googleButtonOuter, isAnyLoading && styles.buttonDisabled]}
+  onPress={handleVendorGoogleSignIn}
+  disabled={isAnyLoading}
+  activeOpacity={0.88}
+>
+  <LinearGradient
+    colors={['#FFFFFF', '#F5F5F7']}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    style={styles.googleButton}
+  >
+    {/* Subtle top sheen */}
+    <LinearGradient
+      colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0)']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={styles.socialSheen}
+      pointerEvents="none"
+    />
+    {oauthLoading === 'google' ? (
+      <ActivityIndicator color="#4285F4" size="small" />
+    ) : (
+      <>
+{/* Google button — replace googleLogoWrap + googleLogoText with: */}
+<View style={styles.socialIconWrap}>
+  <GoogleIcon />
+</View>
+        <Text style={styles.googleButtonText}>Continue with Google</Text>
+        <View style={styles.socialButtonChevron}>
+          <Text style={[styles.socialChevronText, { color: 'rgba(0,0,0,0.2)' }]}>›</Text>
+        </View>
+      </>
+    )}
+  </LinearGradient>
+</TouchableOpacity>
+
 
             {/* Divider */}
             <View style={styles.divider}>
@@ -565,8 +615,9 @@ export default function VendorAuthScreen() {
               disabled={isAnyLoading}
               activeOpacity={0.8}
             >
+              {!loading && <GradientFill borderRadius={12} />}
               {loading ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
+                <ActivityIndicator color="#1A1000" size="small" />
               ) : (
                 <Text style={styles.submitButtonText}>Sign In</Text>
               )}
@@ -683,8 +734,9 @@ export default function VendorAuthScreen() {
               disabled={loading}
               activeOpacity={0.8}
             >
+              {!loading && <GradientFill borderRadius={12} />}
               {loading ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
+                <ActivityIndicator color="#1A1000" size="small" />
               ) : (
                 <Text style={styles.submitButtonText}>Claim Listing</Text>
               )}
@@ -767,6 +819,7 @@ export default function VendorAuthScreen() {
                 }}
                 activeOpacity={0.7}
               >
+                {vendorType === 'restaurant' && <GradientFill borderRadius={12} />}
                 <Text
                   style={[
                     styles.typeButtonText,
@@ -787,6 +840,7 @@ export default function VendorAuthScreen() {
                 }}
                 activeOpacity={0.7}
               >
+                {vendorType === 'grocery' && <GradientFill borderRadius={12} />}
                 <Text
                   style={[
                     styles.typeButtonText,
@@ -846,6 +900,7 @@ export default function VendorAuthScreen() {
                     }}
                     activeOpacity={0.7}
                   >
+                    {selectedState === state.code && <GradientFill borderRadius={20} />}
                     <Text
                       style={[
                         styles.chipText,
@@ -877,6 +932,7 @@ export default function VendorAuthScreen() {
                       }}
                       activeOpacity={0.7}
                     >
+                      {selectedCity === city && <GradientFill borderRadius={20} />}
                       <Text
                         style={[
                           styles.chipText,
@@ -908,6 +964,7 @@ export default function VendorAuthScreen() {
                     }}
                     activeOpacity={0.7}
                   >
+                    {diasporaFocus.includes(segment) && <GradientFill borderRadius={20} />}
                     <Text
                       style={[
                         styles.chipText,
@@ -965,8 +1022,9 @@ export default function VendorAuthScreen() {
             disabled={loading}
             activeOpacity={0.8}
           >
+            {!loading && <GradientFill borderRadius={12} />}
             {loading ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
+              <ActivityIndicator color="#1A1000" size="small" />
             ) : (
               <Text style={styles.submitButtonText}>Submit Application</Text>
             )}
@@ -1052,48 +1110,93 @@ const styles = StyleSheet.create({
     color: '#FF3B30',
     fontWeight: '500',
   },
-  appleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    backgroundColor: '#000000',
-    borderRadius: 12,
-    padding: 16,
-    minHeight: 54,
-  },
-  appleIcon: {
-    fontSize: 20,
-    color: '#FFFFFF',
-    lineHeight: 24,
-  },
-  appleButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  googleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    minHeight: 54,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.12)',
-  },
-  googleIcon: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#4285F4',
-  },
-  googleButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
-  },
+  // Outer wrappers carry the shadow (shadows on LinearGradient are unreliable on Android)
+appleButtonOuter: {
+  borderRadius: 14,
+  shadowColor: '#000000',
+  shadowOffset: { width: 0, height: 5 },
+  shadowOpacity: 0.5,
+  shadowRadius: 14,
+  elevation: 9,
+},
+appleButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+  borderRadius: 14,
+  paddingVertical: 15,
+  paddingHorizontal: 20,
+  minHeight: 56,
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.07)',
+  overflow: 'hidden',
+},
+
+googleButtonOuter: {
+  borderRadius: 14,
+  shadowColor: 'rgba(0,0,0,0.15)',
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 1,
+  shadowRadius: 10,
+  elevation: 4,
+},
+googleButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+  borderRadius: 14,
+  paddingVertical: 15,
+  paddingHorizontal: 20,
+  minHeight: 56,
+  borderWidth: 1,
+  borderColor: 'rgba(0,0,0,0.08)',
+  overflow: 'hidden',
+},
+
+// Shared sheen overlay — sits on top of the gradient, doesn't block touches
+socialSheen: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  height: '50%',
+  borderTopLeftRadius: 14,
+  borderTopRightRadius: 14,
+},
+
+// Remove appleLogoWrap, appleLogoText, googleLogoWrap, googleLogoText
+// Add this single shared style:
+socialIconWrap: {
+  width: 24,
+  height: 24,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+appleButtonText: {
+  flex: 1,
+  fontSize: 15.5,
+  fontWeight: '600',
+  color: '#FFFFFF',
+  letterSpacing: 0.1,
+},
+
+googleButtonText: {
+  flex: 1,
+  fontSize: 15.5,
+  fontWeight: '600',
+  color: '#1F1F1F',
+  letterSpacing: 0.1,
+},
+socialButtonChevron: {
+  width: 20,
+  alignItems: 'flex-end',
+},
+socialChevronText: {
+  fontSize: 20,
+  fontWeight: '300',
+  color: 'rgba(255,255,255,0.3)',
+  lineHeight: 22,
+},
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1142,8 +1245,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   typeButtonSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: 'transparent',
+    borderColor: '#9C7C1A',
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
   },
   typeButtonText: {
     fontSize: 16,
@@ -1151,7 +1259,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   typeButtonTextSelected: {
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
   horizontalScroll: {
     flexGrow: 0,
@@ -1171,8 +1279,13 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   chipSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: 'transparent',
+    borderColor: '#9C7C1A',
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
   },
   chipText: {
     fontSize: 14,
@@ -1180,17 +1293,21 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   chipTextSelected: {
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
   submitButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: 'transparent',
     borderRadius: 12,
     padding: 18,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 56,
     marginTop: 4,
-    elevation: 4,
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 6,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -1198,6 +1315,6 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
 });

@@ -1,24 +1,33 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Platform } from "react-native";
 import * as Linking from "expo-linking";
-import { authClient, setBearerToken, clearAuthTokens } from "@/lib/auth";
+import { API_URL, getBearerToken, setBearerToken, clearAuthTokens } from "@/lib/auth";
 
 interface User {
   id: string;
   email: string;
-  name?: string;
-  image?: string;
+  name?: string | null;
+  image?: string | null;
+  role?: string | null;
+  full_name?: string | null;
+  phone?: string | null;
+  default_location_city?: string | null;
+  default_location_state?: string | null;
+  diaspora_segment?: string[] | null;
+  favorite_cuisines?: string[] | null;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signInWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string, name?: string) => Promise<void>;
+  isAuthenticated: boolean;
+  signInWithEmail: (email: string, password: string) => Promise<User | null>;
+  signUpWithEmail: (email: string, password: string, name?: string) => Promise<User | null>;
   signInWithApple: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
-  fetchUser: () => Promise<void>;
+  fetchUser: () => Promise<User | null>;
+  updateUser: (updates: Partial<Omit<User, 'id' | 'email'>>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -71,14 +80,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
+  const fetchUser = async (): Promise<User | null> => {
     try {
-      const session = await authClient.getSession();
-      const sessionUser = session?.data?.user ?? null;
-      setUser(sessionUser as User | null);
+      const token = await getBearerToken();
+      if (!token) {
+        setUser(null);
+        return null;
+      }
+      const res = await fetch(`${API_URL}/functions/v1/api-auth-me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        setUser(null);
+        return null;
+      }
+      const data = await res.json();
+      const u: User | null = data.user ?? null;
+      setUser(u);
+      return u;
     } catch (error) {
       console.error("Failed to fetch user session:", error);
       setUser(null);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -87,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetchUser();
 
-    const subscription = Linking.addEventListener("url", (event) => {
+    const subscription = Linking.addEventListener("url", () => {
       console.log("Deep link received, refreshing user session");
       fetchUser();
     });
@@ -102,32 +125,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signInWithEmail = async (email: string, password: string) => {
+  const signInWithEmail = async (email: string, password: string): Promise<User | null> => {
     console.log("signInWithEmail called", { email });
-    try {
-      const { error } = await authClient.signIn.email({ email, password });
-      if (error) {
-        throw new Error(error.message || "Email sign in failed");
-      }
-      await fetchUser();
-    } catch (error) {
-      console.error("Email sign in failed:", error);
-      throw error;
-    }
+    const res = await fetch(`${API_URL}/functions/v1/auth-login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Email sign in failed");
+    await setBearerToken(data.token);
+    return fetchUser();
   };
 
-  const signUpWithEmail = async (email: string, password: string, name?: string) => {
+  const signUpWithEmail = async (email: string, password: string, name?: string): Promise<User | null> => {
     console.log("signUpWithEmail called", { email, name });
-    try {
-      const { error } = await authClient.signUp.email({ email, password, name });
-      if (error) {
-        throw new Error(error.message || "Email sign up failed");
-      }
-      await fetchUser();
-    } catch (error) {
-      console.error("Email sign up failed:", error);
-      throw error;
-    }
+    const res = await fetch(`${API_URL}/functions/v1/auth-signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, name: name ?? "" }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Email sign up failed");
+    await setBearerToken(data.token);
+    return fetchUser();
   };
 
   const signInWithSocial = async (provider: string) => {
@@ -137,14 +158,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await setBearerToken(token);
       await fetchUser();
     } else {
-      const { error } = await authClient.signIn.social({
-        provider,
-        callbackURL: "/auth-callback",
-      });
-      if (error) {
-        throw new Error(error.message || "Social sign in failed");
+      const WebBrowser = await import("expo-web-browser");
+      const callbackURL = "jambalayajerkjollof://auth-callback";
+      const authURL = `${API_URL}/functions/v1/auth-social?provider=${provider}&callbackURL=${encodeURIComponent(callbackURL)}`;
+      const result = await WebBrowser.openAuthSessionAsync(authURL, callbackURL);
+
+      if (result.type === "success" && result.url) {
+        const queryString = result.url.includes("?") ? result.url.split("?")[1] : "";
+        const token = new URLSearchParams(queryString).get("better_auth_token");
+        if (!token) throw new Error(`${provider} sign in failed: no token received`);
+        await setBearerToken(token);
+        await fetchUser();
+      } else if (result.type === "cancel" || result.type === "dismiss") {
+        throw new Error("Authentication cancelled");
+      } else {
+        throw new Error(`${provider} sign in failed`);
       }
-      await fetchUser();
     }
   };
 
@@ -156,7 +185,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithApple = async () => {
     console.log("signInWithApple called");
     if (Platform.OS === "ios") {
-      // Native Apple Sign In on iOS — shows the system Face ID / password modal
       const AppleAuthentication = await import("expo-apple-authentication");
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
@@ -167,30 +195,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!credential.identityToken) {
         throw new Error("No identity token received from Apple");
       }
-      const { error } = await authClient.signIn.social({
-        provider: "apple",
-        idToken: credential.identityToken,
+      const res = await fetch(`${API_URL}/functions/v1/auth-social`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "apple", idToken: credential.identityToken }),
       });
-      if (error) {
-        throw new Error(error.message || "Apple sign in failed");
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Apple sign in failed");
+      await setBearerToken(data.token);
       await fetchUser();
     } else {
-      // Web / Android: OAuth redirect flow
       await signInWithSocial("apple");
     }
   };
 
   const signOut = async () => {
     console.log("signOut called");
-    try {
-      await authClient.signOut();
-    } catch (error) {
-      console.error("Sign out failed (API):", error);
-    } finally {
-      setUser(null);
-      await clearAuthTokens();
-    }
+    setUser(null);
+    await clearAuthTokens();
+  };
+
+  const updateUser = async (updates: Partial<Omit<User, 'id' | 'email'>>) => {
+    const token = await getBearerToken();
+    if (!token) throw new Error("Not authenticated");
+    const res = await fetch(`${API_URL}/functions/v1/api-user-profile`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(updates),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to update profile");
+    if (data.profile) setUser(data.profile);
   };
 
   return (
@@ -198,12 +233,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
+        isAuthenticated: !!user,
         signInWithEmail,
         signUpWithEmail,
         signInWithApple,
         signInWithGoogle,
         signOut,
         fetchUser,
+        updateUser,
       }}
     >
       {children}

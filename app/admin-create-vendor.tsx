@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
+import { GradientFill } from '@/components/GradientFill';
 import { api } from '@/utils/api';
 import * as Haptics from 'expo-haptics';
 
@@ -111,11 +112,12 @@ export default function AdminCreateVendorScreen() {
                   style={[styles.typeButton, vendorType === type && styles.typeButtonActive]}
                   onPress={() => setVendorType(type)}
                 >
+                  {vendorType === type && <GradientFill borderRadius={12} />}
                   <IconSymbol
                     ios_icon_name={type === 'restaurant' ? 'fork.knife' : 'cart.fill'}
                     android_material_icon_name={type === 'restaurant' ? 'restaurant' : 'shopping-cart'}
                     size={24}
-                    color={vendorType === type ? '#FFFFFF' : colors.text}
+                    color={vendorType === type ? '#1A1000' : colors.text}
                   />
                   <Text style={[styles.typeButtonText, vendorType === type && styles.typeButtonTextActive]}>
                     {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -150,6 +152,7 @@ export default function AdminCreateVendorScreen() {
                   style={[styles.chip, diasporaFocus.includes(segment) && styles.chipActive]}
                   onPress={() => toggleDiasporaFocus(segment)}
                 >
+                  {diasporaFocus.includes(segment) && <GradientFill borderRadius={20} />}
                   <Text style={[styles.chipText, diasporaFocus.includes(segment) && styles.chipTextActive]}>{segment}</Text>
                 </TouchableOpacity>
               ))}
@@ -191,6 +194,7 @@ export default function AdminCreateVendorScreen() {
           </View>
 
           <TouchableOpacity style={[styles.createButton, loading && { opacity: 0.6 }]} onPress={handleCreate} disabled={loading}>
+            {!loading && <GradientFill borderRadius={12} />}
             <Text style={styles.createButtonText}>{loading ? 'Creating...' : 'Create Vendor'}</Text>
           </TouchableOpacity>
 
@@ -214,9 +218,9 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: '700', color: colors.text, marginBottom: 12 },
   typeSelector: { flexDirection: 'row', gap: 12 },
   typeButton: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.card, borderRadius: 12, padding: 16, borderWidth: 2, borderColor: colors.highlight },
-  typeButtonActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  typeButtonActive: { backgroundColor: 'transparent', borderColor: '#9C7C1A', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
   typeButtonText: { fontSize: 16, fontWeight: '600', color: colors.text },
-  typeButtonTextActive: { color: '#FFFFFF' },
+  typeButtonTextActive: { color: '#1A1000' },
   inputGroup: { marginBottom: 16 },
   label: { fontSize: 14, fontWeight: '600', color: colors.text, marginBottom: 8 },
   input: { backgroundColor: colors.card, borderRadius: 8, padding: 12, fontSize: 16, color: colors.text, borderWidth: 1, borderColor: colors.highlight },
@@ -224,9 +228,9 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 12 },
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.highlight },
-  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipActive: { backgroundColor: 'transparent', borderColor: '#9C7C1A', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
   chipText: { fontSize: 14, fontWeight: '600', color: colors.text },
-  chipTextActive: { color: '#FFFFFF' },
-  createButton: { backgroundColor: colors.primary, borderRadius: 12, padding: 16, alignItems: 'center', elevation: 2 },
-  createButtonText: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
+  chipTextActive: { color: '#1A1000' },
+  createButton: { backgroundColor: 'transparent', borderRadius: 12, padding: 16, alignItems: 'center', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 6 },
+  createButtonText: { fontSize: 16, fontWeight: '700', color: '#1A1000' },
 });

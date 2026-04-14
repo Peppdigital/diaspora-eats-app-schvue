@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
 import { useCart } from '@/contexts/CartContext';
+import { GradientFill } from '@/components/GradientFill';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/utils/api';
 import * as Haptics from 'expo-haptics';
@@ -45,6 +46,7 @@ export default function CheckoutScreen() {
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Please sign in to checkout</Text>
           <TouchableOpacity style={styles.signInButton} onPress={() => router.push('/auth/customer-auth')}>
+            <GradientFill borderRadius={12} />
             <Text style={styles.signInButtonText}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -225,6 +227,7 @@ export default function CheckoutScreen() {
           onPress={handlePayNow}
           disabled={isProcessing}
         >
+          <GradientFill borderRadius={12} />
           <Text style={styles.payButtonText}>
             {isProcessing ? 'Processing...' : `Pay Now • $${total.toFixed(2)}`}
           </Text>
@@ -264,11 +267,11 @@ const styles = StyleSheet.create({
   totalLabel: { fontSize: 18, fontWeight: '700', color: colors.text },
   totalValue: { fontSize: 18, fontWeight: '700', color: colors.primary },
   footer: { padding: 20, backgroundColor: colors.background, borderTopWidth: 1, borderTopColor: colors.highlight },
-  payButton: { backgroundColor: colors.primary, borderRadius: 12, padding: 18, alignItems: 'center' },
+  payButton: { backgroundColor: 'transparent', borderRadius: 12, padding: 18, alignItems: 'center', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 6 },
   payButtonDisabled: { opacity: 0.5 },
-  payButtonText: { fontSize: 18, fontWeight: '700', color: '#FFFFFF' },
+  payButtonText: { fontSize: 18, fontWeight: '700', color: '#1A1000' },
   errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
   errorText: { fontSize: 18, color: colors.textSecondary, marginBottom: 20 },
-  signInButton: { backgroundColor: colors.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  signInButtonText: { fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
+  signInButton: { backgroundColor: 'transparent', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
+  signInButtonText: { fontSize: 16, fontWeight: '600', color: '#1A1000' },
 });

@@ -13,6 +13,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
+import { GradientFill } from '@/components/GradientFill';
 import { MOCK_MENU_ITEMS } from '@/constants/MockMenuData';
 import { MOCK_VENDORS } from '@/constants/MockVendorData';
 import { useCart } from '@/contexts/CartContext';
@@ -216,10 +217,11 @@ export default function MenuItemDetailScreen() {
 
       {/* Add to Cart Button */}
       <View style={styles.footer}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.addButton}
           onPress={handleAddToCart}
         >
+          <GradientFill borderRadius={12} />
           <Text style={styles.addButtonText}>
             Add to Cart • ${(menuItem.price * quantity).toFixed(2)}
           </Text>
@@ -378,15 +380,20 @@ const styles = StyleSheet.create({
     borderTopColor: colors.highlight,
   },
   addButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: 'transparent',
     borderRadius: 12,
     padding: 18,
     alignItems: 'center',
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 6,
   },
   addButtonText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
   errorText: {
     fontSize: 16,

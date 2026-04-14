@@ -12,6 +12,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '@react-navigation/native';
 import { colors } from '@/styles/commonStyles';
+import { GradientFill } from '@/components/GradientFill';
 import { IconSymbol } from '@/components/IconSymbol';
 import { api } from '@/utils/api';
 
@@ -125,7 +126,8 @@ export default function EventDetailScreen() {
       <View style={[styles.container, { backgroundColor: bgColor }]}>
         <View style={styles.errorContainer}>
           <Text style={[styles.errorText, { color: textColor }]}>{error || 'Event not found'}</Text>
-          <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={() => router.back()}>
+          <TouchableOpacity style={styles.button} onPress={() => router.back()}>
+            <GradientFill borderRadius={12} />
             <Text style={styles.buttonText}>Go Back</Text>
           </TouchableOpacity>
         </View>
@@ -204,8 +206,9 @@ export default function EventDetailScreen() {
                   <Text style={[styles.infoValue, { color: textColor }]}>{event.city}{event.state ? `, ${event.state}` : ''} {event.venue_zip || ''}</Text>
                 </View>
               </View>
-              <TouchableOpacity style={[styles.directionsButton, { backgroundColor: colors.primary }]} onPress={handleGetDirections} activeOpacity={0.8}>
-                <IconSymbol ios_icon_name="arrow.triangle.turn.up.right.diamond.fill" android_material_icon_name="directions" size={16} color="#FFFFFF" />
+              <TouchableOpacity style={styles.directionsButton} onPress={handleGetDirections} activeOpacity={0.8}>
+                <GradientFill borderRadius={12} />
+                <IconSymbol ios_icon_name="arrow.triangle.turn.up.right.diamond.fill" android_material_icon_name="directions" size={16} color="#1A1000" />
                 <Text style={styles.directionsButtonText}>Get Directions</Text>
               </TouchableOpacity>
             </View>
@@ -262,25 +265,28 @@ export default function EventDetailScreen() {
       <View style={[styles.actionBar, { backgroundColor: cardColor }]}>
         <View style={styles.rsvpButtons}>
           <TouchableOpacity
-            style={[styles.rsvpButton, { backgroundColor: attendeeStatus === 'interested' ? colors.primary : bgColor }, attendeeStatus === 'interested' && styles.rsvpButtonActive]}
+            style={[styles.rsvpButton, { backgroundColor: bgColor }, attendeeStatus === 'interested' && styles.rsvpButtonActive]}
             onPress={() => handleRSVP('interested')}
             activeOpacity={0.8}
           >
-            <IconSymbol ios_icon_name="star" android_material_icon_name="star-border" size={18} color={attendeeStatus === 'interested' ? '#FFFFFF' : textColor} />
-            <Text style={[styles.rsvpButtonText, { color: attendeeStatus === 'interested' ? '#FFFFFF' : textColor }]}>Interested</Text>
+            {attendeeStatus === 'interested' && <GradientFill borderRadius={12} />}
+            <IconSymbol ios_icon_name="star" android_material_icon_name="star-border" size={18} color={attendeeStatus === 'interested' ? '#1A1000' : textColor} />
+            <Text style={[styles.rsvpButtonText, { color: attendeeStatus === 'interested' ? '#1A1000' : textColor }]}>Interested</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.rsvpButton, { backgroundColor: attendeeStatus === 'going' ? colors.primary : bgColor }, attendeeStatus === 'going' && styles.rsvpButtonActive]}
+            style={[styles.rsvpButton, { backgroundColor: bgColor }, attendeeStatus === 'going' && styles.rsvpButtonActive]}
             onPress={() => handleRSVP('going')}
             activeOpacity={0.8}
           >
-            <IconSymbol ios_icon_name="checkmark.circle" android_material_icon_name="check-circle" size={18} color={attendeeStatus === 'going' ? '#FFFFFF' : textColor} />
-            <Text style={[styles.rsvpButtonText, { color: attendeeStatus === 'going' ? '#FFFFFF' : textColor }]}>Going</Text>
+            {attendeeStatus === 'going' && <GradientFill borderRadius={12} />}
+            <IconSymbol ios_icon_name="checkmark.circle" android_material_icon_name="check-circle" size={18} color={attendeeStatus === 'going' ? '#1A1000' : textColor} />
+            <Text style={[styles.rsvpButtonText, { color: attendeeStatus === 'going' ? '#1A1000' : textColor }]}>Going</Text>
           </TouchableOpacity>
         </View>
         {event.ticket_url && (
-          <TouchableOpacity style={[styles.ticketButton, { backgroundColor: colors.primary }]} onPress={handleGetTickets} activeOpacity={0.8}>
-            <IconSymbol ios_icon_name="ticket.fill" android_material_icon_name="confirmation-number" size={20} color="#FFFFFF" />
+          <TouchableOpacity style={styles.ticketButton} onPress={handleGetTickets} activeOpacity={0.8}>
+            <GradientFill borderRadius={12} />
+            <IconSymbol ios_icon_name="ticket.fill" android_material_icon_name="confirmation-number" size={20} color="#1A1000" />
             <Text style={styles.ticketButtonText}>Get Tickets</Text>
           </TouchableOpacity>
         )}
@@ -310,8 +316,8 @@ const styles = StyleSheet.create({
   infoTextContainer: { flex: 1 },
   infoLabel: { fontSize: 13, fontWeight: '600', marginBottom: 4 },
   infoValue: { fontSize: 15, fontWeight: '500', lineHeight: 22 },
-  directionsButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 12, marginTop: 12 },
-  directionsButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  directionsButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 12, marginTop: 12, backgroundColor: 'transparent', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
+  directionsButtonText: { color: '#1A1000', fontSize: 14, fontWeight: '700' },
   section: { marginBottom: 24 },
   sectionTitle: { fontSize: 20, fontWeight: '700', marginBottom: 12 },
   description: { fontSize: 16, lineHeight: 24 },
@@ -322,12 +328,12 @@ const styles = StyleSheet.create({
   actionBar: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, paddingBottom: 32, elevation: 8 },
   rsvpButtons: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   rsvpButton: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderRadius: 12, borderWidth: 1, borderColor: colors.highlight },
-  rsvpButtonActive: { borderColor: colors.primary },
+  rsvpButtonActive: { borderColor: '#9C7C1A', backgroundColor: 'transparent', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
   rsvpButtonText: { fontSize: 14, fontWeight: '700' },
-  ticketButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 12 },
-  ticketButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  ticketButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 12, backgroundColor: 'transparent', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 6 },
+  ticketButtonText: { color: '#1A1000', fontSize: 16, fontWeight: '700' },
   errorContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 },
   errorText: { fontSize: 18, fontWeight: '600', marginBottom: 20 },
-  button: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  button: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, backgroundColor: 'transparent', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 4, elevation: 4 },
+  buttonText: { color: '#1A1000', fontSize: 16, fontWeight: '700' },
 });

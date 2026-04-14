@@ -1,1 +1,13 @@
 project_id = "vitgqdlredogyfuodnfy"
+
+[functions.auth-social]
+verify_jwt = false
+
+[functions.auth-social-callback]
+verify_jwt = false
+
+[functions.auth-login]
+verify_jwt = false
+
+[functions.auth-signup]
+verify_jwt = false

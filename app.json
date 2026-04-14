@@ -1,34 +1,33 @@
 {
   "expo": {
-    "name": "Diaspora Eats",
+    "name": "Jambalaya . Jerk . Jollof",
     "slug": "diaspora-eats",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/diaspora_eats_logo.png",
+    "icon": "./assets/images/aeo_logo_512.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/diaspora_eats_logo.png",
+      "image": "./assets/images/aeo_logo_512.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ooosumfoods.jambalayajerkjollof",
+      "backgroundColor": "#0D0D0D",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/diaspora_eats_logo.png",
+        "foregroundImage": "./assets/images/aeo_logo_512.png",
         "backgroundColor": "#000000"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.ooosumfoods.jambalayajerkjollof"
     },
     "web": {
-      "favicon": "./assets/images/final_quest_240x240.png",
+      "favicon": "./assets/images/aeo_favicon_32.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -37,12 +36,16 @@
       "expo-web-browser",
       "expo-secure-store"
     ],
-    "scheme": "diasporaeats",
+    "scheme": "jambalayajerkjollof",
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
-      "router": {}
+      "router": {},
+      "backendUrl": "https://vitgqdlredogyfuodnfy.supabase.co/functions/v1",
+      "eas": {
+        "projectId": "11e0cbaf-c71d-4626-9a4f-2fb537e493d9"
+      }
     }
   },
   "scheme": "jambalayajerkjollof"

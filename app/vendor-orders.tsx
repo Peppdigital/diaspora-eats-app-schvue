@@ -14,6 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
 import { api } from '@/utils/api';
+import { GradientFill } from '@/components/GradientFill';
 import * as Haptics from 'expo-haptics';
 
 type OrderStatus = 'pending' | 'accepted' | 'in_progress' | 'ready_for_pickup' | 'out_for_delivery' | 'completed' | 'cancelled';
@@ -137,20 +138,24 @@ export default function VendorOrdersScreen() {
           </View>
 
           <View style={styles.filterContainer}>
-            {(['all', 'pending', 'active', 'completed'] as const).map((f) => (
-              <TouchableOpacity
-                key={f}
-                style={[styles.filterTab, filter === f && styles.filterTabActive]}
-                onPress={() => {
-                  console.log('[VendorOrders] Filter changed:', f);
-                  setFilter(f);
-                }}
-              >
-                <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>
-                  {f.charAt(0).toUpperCase() + f.slice(1)}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {(['all', 'pending', 'active', 'completed'] as const).map((f) => {
+              const isActive = filter === f;
+              return (
+                <TouchableOpacity
+                  key={f}
+                  style={[styles.filterTab, isActive && styles.filterTabActive]}
+                  onPress={() => {
+                    console.log('[VendorOrders] Filter changed:', f);
+                    setFilter(f);
+                  }}
+                >
+                  {isActive && <GradientFill borderRadius={20} />}
+                  <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
+                    {f.charAt(0).toUpperCase() + f.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
           {loading && <View style={styles.loadingContainer}><ActivityIndicator size="large" color={colors.primary} /></View>}
@@ -159,6 +164,7 @@ export default function VendorOrdersScreen() {
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>{error}</Text>
               <TouchableOpacity style={styles.retryButton} onPress={fetchOrders}>
+                <GradientFill borderRadius={12} />
                 <Text style={styles.retryButtonText}>Retry</Text>
               </TouchableOpacity>
             </View>
@@ -217,6 +223,7 @@ export default function VendorOrdersScreen() {
                     )}
                     {nextStatus && (
                       <TouchableOpacity style={styles.updateButton} onPress={() => handleUpdateStatus(order.id, nextStatus)}>
+                        <GradientFill borderRadius={8} />
                         <Text style={styles.updateButtonText}>Mark as {nextStatusDisplay}</Text>
                       </TouchableOpacity>
                     )}
@@ -253,9 +260,9 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 20, fontWeight: '700', color: colors.text },
   filterContainer: { flexDirection: 'row', gap: 8, marginBottom: 20 },
   filterTab: { flex: 1, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 20, backgroundColor: colors.highlight, alignItems: 'center' },
-  filterTabActive: { backgroundColor: colors.primary },
+  filterTabActive: { backgroundColor: 'transparent', shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
   filterText: { fontSize: 13, fontWeight: '600', color: colors.textSecondary },
-  filterTextActive: { color: '#FFFFFF' },
+  filterTextActive: { color: '#1A1000' },
   loadingContainer: { paddingVertical: 60, alignItems: 'center' },
   ordersList: { gap: 16 },
   orderCard: { backgroundColor: colors.card, borderRadius: 12, padding: 16, elevation: 2 },
@@ -270,13 +277,13 @@ const styles = StyleSheet.create({
   metaText: { fontSize: 12, color: colors.textSecondary, textTransform: 'capitalize' },
   itemsList: { marginBottom: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.highlight },
   itemText: { fontSize: 13, color: colors.text, marginBottom: 4 },
-  updateButton: { backgroundColor: colors.primary, borderRadius: 8, padding: 12, alignItems: 'center', marginBottom: 8 },
-  updateButtonText: { fontSize: 14, fontWeight: '600', color: '#FFFFFF', textTransform: 'capitalize' },
+  updateButton: { backgroundColor: 'transparent', borderRadius: 8, padding: 12, alignItems: 'center', marginBottom: 8, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
+  updateButtonText: { fontSize: 14, fontWeight: '600', color: '#1A1000', textTransform: 'capitalize' },
   cancelButton: { backgroundColor: colors.highlight, borderRadius: 8, padding: 12, alignItems: 'center' },
   cancelButtonText: { fontSize: 14, fontWeight: '600', color: '#FF3B30' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 80 },
   emptyTitle: { fontSize: 24, fontWeight: '700', color: colors.text, marginTop: 20, marginBottom: 8 },
   emptyText: { fontSize: 16, color: colors.textSecondary, textAlign: 'center' },
-  retryButton: { marginTop: 16, backgroundColor: colors.primary, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12 },
-  retryButtonText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
+  retryButton: { marginTop: 16, backgroundColor: 'transparent', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
+  retryButtonText: { color: '#1A1000', fontWeight: '700', fontSize: 14 },
 });

@@ -1,9 +1,8 @@
-import Constants from "expo-constants";
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { BEARER_TOKEN_KEY } from "@/lib/auth";
 
-export const BACKEND_URL = Constants.expoConfig?.extra?.backendUrl || "";
+export const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || "";
 
 export const isBackendConfigured = (): boolean => {
   return !!BACKEND_URL && BACKEND_URL.length > 0;
@@ -139,4 +138,12 @@ export const authenticatedDelete = async <T = any>(endpoint: string, data: any =
     method: "DELETE",
     body: JSON.stringify(data),
   });
+};
+
+export const api = {
+  get: apiGet,
+  post: apiPost,
+  put: apiPut,
+  patch: apiPatch,
+  delete: apiDelete,
 };

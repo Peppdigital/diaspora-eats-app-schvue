@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as colors from '@/components/colors';
 import { useCart } from '@/contexts/CartContext';
+import { GradientFill } from '@/components/GradientFill';
 import { MOCK_VENDORS } from '@/constants/MockVendorData';
 import * as Haptics from 'expo-haptics';
 
@@ -86,10 +87,11 @@ export default function CartScreen() {
           />
           <Text style={styles.emptyTitle}>Your cart is empty</Text>
           <Text style={styles.emptyText}>Add items from a restaurant or grocery store to get started</Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.browseButton}
             onPress={() => router.push('/(tabs)/(home)')}
           >
+            <GradientFill borderRadius={12} />
             <Text style={styles.browseButtonText}>Browse Vendors</Text>
           </TouchableOpacity>
         </View>
@@ -113,7 +115,7 @@ export default function CartScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Order Type</Text>
             <View style={styles.toggleContainer}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[
                   styles.toggleButton,
                   orderType === 'pickup' && styles.toggleButtonActive
@@ -123,20 +125,18 @@ export default function CartScreen() {
                   setOrderType('pickup');
                 }}
               >
-                <IconSymbol 
-                  ios_icon_name="bag" 
+                {orderType === 'pickup' && <GradientFill borderRadius={12} />}
+                <IconSymbol
+                  ios_icon_name="bag"
                   android_material_icon_name="shopping-bag"
-                  size={20} 
-                  color={orderType === 'pickup' ? '#FFFFFF' : colors.text}
+                  size={20}
+                  color={orderType === 'pickup' ? '#1A1000' : colors.text}
                 />
-                <Text style={[
-                  styles.toggleText,
-                  orderType === 'pickup' && styles.toggleTextActive
-                ]}>
+                <Text style={[styles.toggleText, orderType === 'pickup' && styles.toggleTextActive]}>
                   Pickup
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[
                   styles.toggleButton,
                   orderType === 'delivery' && styles.toggleButtonActive
@@ -147,16 +147,14 @@ export default function CartScreen() {
                 }}
                 disabled={!vendor?.offers_delivery}
               >
-                <IconSymbol 
-                  ios_icon_name="car.fill" 
+                {orderType === 'delivery' && <GradientFill borderRadius={12} />}
+                <IconSymbol
+                  ios_icon_name="car.fill"
                   android_material_icon_name="local-shipping"
-                  size={20} 
-                  color={orderType === 'delivery' ? '#FFFFFF' : colors.text}
+                  size={20}
+                  color={orderType === 'delivery' ? '#1A1000' : colors.text}
                 />
-                <Text style={[
-                  styles.toggleText,
-                  orderType === 'delivery' && styles.toggleTextActive
-                ]}>
+                <Text style={[styles.toggleText, orderType === 'delivery' && styles.toggleTextActive]}>
                   Delivery
                 </Text>
               </TouchableOpacity>
@@ -305,11 +303,12 @@ export default function CartScreen() {
 
       {/* Checkout Button */}
       <View style={styles.footer}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.checkoutButton, !canCheckout && styles.checkoutButtonDisabled]}
           onPress={handleCheckout}
           disabled={!canCheckout}
         >
+          {canCheckout && <GradientFill borderRadius={12} />}
           <Text style={styles.checkoutButtonText}>
             Proceed to Checkout • ${getTotal().toFixed(2)}
           </Text>
@@ -351,15 +350,20 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   browseButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: 'transparent',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 5,
   },
   browseButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
   vendorHeader: {
     marginBottom: 24,
@@ -400,8 +404,13 @@ const styles = StyleSheet.create({
     borderColor: colors.highlight,
   },
   toggleButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: 'transparent',
+    borderColor: '#9C7C1A',
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 5,
   },
   toggleText: {
     fontSize: 16,
@@ -409,7 +418,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   toggleTextActive: {
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
   cartItem: {
     flexDirection: 'row',
@@ -527,10 +536,15 @@ const styles = StyleSheet.create({
     borderTopColor: colors.highlight,
   },
   checkoutButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: 'transparent',
     borderRadius: 12,
     padding: 18,
     alignItems: 'center',
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 6,
   },
   checkoutButtonDisabled: {
     backgroundColor: colors.textSecondary,
@@ -539,6 +553,6 @@ const styles = StyleSheet.create({
   checkoutButtonText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#1A1000',
   },
 });

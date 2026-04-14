@@ -2,7 +2,9 @@ import React, { useEffect } from "react";
 import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { Platform } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { authClient } from "@/lib/auth";
+import { API_URL } from "@/lib/auth";
+
+const FUNCTION_BASE = `${API_URL}/functions/v1`;
 
 export default function AuthPopupScreen() {
   const { provider } = useLocalSearchParams<{ provider: string }>();
@@ -10,15 +12,14 @@ export default function AuthPopupScreen() {
   useEffect(() => {
     if (Platform.OS !== "web") return;
 
-    if (!provider || !"[\"apple\", \"google\"]".includes(provider)) {
+    if (!provider || !["apple", "google"].includes(provider)) {
       window.opener?.postMessage({ type: "oauth-error", error: "Invalid provider" }, window.location.origin);
       return;
     }
 
-    authClient.signIn.social({
-      provider: provider as any,
-      callbackURL: `${window.location.origin}/auth-callback`,
-    });
+    const callbackURL = `${window.location.origin}/auth-callback`;
+    const url = `${FUNCTION_BASE}/auth-social?provider=${provider}&callbackURL=${encodeURIComponent(callbackURL)}`;
+    window.location.href = url;
   }, [provider]);
 
   return (

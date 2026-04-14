@@ -12,6 +12,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { GradientFill } from '@/components/GradientFill';
 import { useAuth } from '@/contexts/AuthContext';
 import { colors, typography } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
@@ -125,21 +126,40 @@ export default function HomeScreen() {
         {/* Category Chips */}
         <View style={styles.categorySection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
-            {categories.map((category) => (
-              <TouchableOpacity
-                key={category}
-                style={[styles.categoryChip, selectedCategory === category && styles.categoryChipActive]}
-                onPress={() => {
-                  console.log('[Home] Category selected:', category);
-                  setSelectedCategory(category);
-                }}
-                activeOpacity={0.8}
-              >
-                <Text style={[styles.categoryText, selectedCategory === category && styles.categoryTextActive]}>
-                  {category}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {categories.map((category) => {
+              const isActive = selectedCategory === category;
+              return (
+                <TouchableOpacity
+                  key={category}
+                  style={[styles.categoryChip, isActive && styles.categoryChipActive]}
+                  onPress={() => {
+                    console.log('[Home] Category selected:', category);
+                    setSelectedCategory(category);
+                  }}
+                  activeOpacity={0.8}
+                >
+                  {isActive && (
+                    <>
+                      <LinearGradient
+                        colors={['#F5D67A', '#D4AF37', '#9C7C1A']}
+                        start={{ x: 0.2, y: 0 }}
+                        end={{ x: 0.8, y: 1 }}
+                        style={[StyleSheet.absoluteFillObject, { borderRadius: 24 }]}
+                      />
+                      <LinearGradient
+                        colors={['rgba(255,255,255,0.22)', 'rgba(255,255,255,0)']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 0.6 }}
+                        style={[StyleSheet.absoluteFillObject, { borderRadius: 24 }]}
+                      />
+                    </>
+                  )}
+                  <Text style={[styles.categoryText, isActive && styles.categoryTextActive]}>
+                    {category}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
 
@@ -153,6 +173,7 @@ export default function HomeScreen() {
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity onPress={fetchData} style={styles.retryButton}>
+              <GradientFill borderRadius={12} />
               <Text style={styles.retryText}>Retry</Text>
             </TouchableOpacity>
           </View>
@@ -181,8 +202,12 @@ export default function HomeScreen() {
                   <Image source={{ uri: getVendorImage(vendor) }} style={styles.restaurantImage} />
                   <LinearGradient colors={['transparent', 'rgba(13, 13, 13, 0.95)']} style={styles.restaurantGradient}>
                     <View style={styles.restaurantInfo}>
-                      <Text style={styles.restaurantName}>{vendor.name}</Text>
-                      <Text style={styles.restaurantTagline}>{vendor.tagline || vendor.cuisine_type || ''}</Text>
+                      <Text style={[styles.restaurantName, { color: colors.text }]} numberOfLines={2}>
+                        {vendor.name}
+                      </Text>
+                      <Text style={[styles.restaurantTagline, { color: colors.primary }]}>
+                        {vendor.tagline || vendor.cuisine_type || ''}
+                      </Text>
                       <View style={styles.restaurantMeta}>
                         <View style={styles.ratingBadge}>
                           <IconSymbol ios_icon_name="star.fill" android_material_icon_name="star" size={14} color={colors.gold} />
@@ -235,7 +260,9 @@ export default function HomeScreen() {
                       <Text style={styles.eventDate}>{eventDateDisplay}</Text>
                     </LinearGradient>
                     <View style={styles.eventInfo}>
-                      <Text style={styles.eventTitle} numberOfLines={2}>{event.title}</Text>
+                      <Text style={[styles.eventTitle, { color: colors.text }]} numberOfLines={2}>
+                        {event.title}
+                      </Text>
                       <View style={styles.eventMeta}>
                         <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location-on" size={14} color={colors.gold} />
                         <Text style={styles.eventLocation}>{event.city || ''}</Text>
@@ -271,14 +298,22 @@ const styles = StyleSheet.create({
   categorySection: { marginBottom: 24 },
   categoryScroll: { paddingHorizontal: 20, gap: 12 },
   categoryChip: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 24, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
-  categoryChipActive: { backgroundColor: colors.gold, borderColor: colors.gold },
-  categoryText: { ...typography.labelLarge, fontWeight: '700' },
+  categoryChipActive: {
+    backgroundColor: 'transparent',
+    borderColor: '#9C7C1A',
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.55,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  categoryText: { ...typography.labelLarge, fontWeight: '700', color: '#777676' },
   categoryTextActive: { color: '#0D0D0D' },
   loadingContainer: { paddingVertical: 60, alignItems: 'center' },
   errorContainer: { paddingHorizontal: 20, paddingVertical: 40, alignItems: 'center' },
   errorText: { color: '#FF3B30', fontSize: 15, textAlign: 'center', marginBottom: 16 },
-  retryButton: { backgroundColor: colors.gold, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12 },
-  retryText: { color: '#0D0D0D', fontWeight: '700', fontSize: 14 },
+  retryButton: { backgroundColor: 'transparent', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12, shadowColor: '#D4AF37', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 5 },
+  retryText: { color: '#1A1000', fontWeight: '700', fontSize: 14 },
   section: { marginBottom: 32 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 16 },
   sectionTitle: { ...typography.h3, fontSize: 22 },
